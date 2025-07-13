@@ -1,0 +1,124 @@
+  smartcontract git:(main) ✗ ./deploy.sh
+
+🚀 Iniciando deploy completo dos contratos...
+================================================
+Enter keystore password:
+[⠊] Compiling...
+No files changed, compilation skipped
+Script ran successfully.
+
+== Logs ==
+  [1] Deployer address: 0x5a6Bb86Ab5986B5b8CAd04F3732dA96989969300
+  [2] Deployer balance: 7268907111243000000000
+  [3] Deploying HypeToken...
+  [4] HypeToken deployed at: 0x235B57c48F1Eec80a6b57c26135AF20cA4CC06C9
+  [5] Deploying MockAzuro...
+  [6] MockAzuro deployed at: 0x20F9c10330D01c217de1c89cb74fc266e83432d8
+  [7] Deploying Oracle...
+  [8] Oracle deployed at: 0x73Bc482E442DFf2E2667Fc9D1e9563E6Ed65B9EE
+  [9] Deploying Fanify...
+  [10] Fanify deployed at: 0x4A3D5602BE38B6af7069833Ff6C0C62431f8083e
+  [11] Deploying TeamNFT...
+  [12] TeamNFT deployed at: 0x1BF8B04F5B3626fC02876A1e7DC9A3E74FA12334
+  [13] Deploying MockFanX...
+  [14] MockFanX deployed at: 0x092D49d558058e4DA8951CFf020282a0075Af313
+  [15] Deploying Seasonfy...
+  [16] Seasonfy deployed at: 0x9CBF37164E2CB7B21Efeb0Fe9C4DcF97E1fE1c26
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 88882
+
+Estimated gas price: 5000.000000001 gwei
+
+Estimated total gas used for script: 31410055
+
+Estimated amount required: 157.050275000031410055 ETH
+
+==========================
+Enter keystore password:
+
+##### 88882
+✅  [Success] Hash: 0x560aafa1fa311d2dc6f98df230b9e3b3513ed1b3af2edae8d71a35b4354c91e5
+Contract Address: 0x20F9c10330D01c217de1c89cb74fc266e83432d8
+Block: 26258904
+Paid: 10.3971645 ETH (2310481 gas * 4500 gwei)
+
+
+##### 88882
+✅  [Success] Hash: 0x3b48c2dce75a24f1a061f71a402ac2ef7e2e8b361277aa68446de3510aa34980
+Block: 26258905
+Paid: 0.2087415 ETH (46387 gas * 4500 gwei)
+
+
+##### 88882
+✅  [Success] Hash: 0x006de678183c847aa7332e90d5663d270eef645797ef06d4bcd7b0e934378419
+Contract Address: 0x235B57c48F1Eec80a6b57c26135AF20cA4CC06C9
+Block: 26258904
+Paid: 15.156045 ETH (3368010 gas * 4500 gwei)
+
+
+##### 88882
+✅  [Success] Hash: 0x7224a9f1c3a7b6c4e0097c58cec3a8e0346fa0b09ff52fa7fc6de76f9b13d471
+Contract Address: 0x4A3D5602BE38B6af7069833Ff6C0C62431f8083e
+Block: 26258904
+Paid: 15.7713525 ETH (3504745 gas * 4500 gwei)
+
+
+##### 88882
+✅  [Success] Hash: 0x6ad82f53b6bf2dbb2e357c50ad9a4f5bc380f4a7269255a43ced302af70872be
+Contract Address: 0x1BF8B04F5B3626fC02876A1e7DC9A3E74FA12334
+Block: 26258905
+Paid: 13.853988 ETH (3078664 gas * 4500 gwei)
+
+
+##### 88882
+✅  [Success] Hash: 0x2a7f4be19487762e1d6d1b41191cfe107f5b4a1758cfdbb9d68bcd86a8df7c5c
+Block: 26258905
+Paid: 0.208557 ETH (46346 gas * 4500 gwei)
+
+
+##### 88882
+✅  [Success] Hash: 0xa63b8f84a074fda81f686df16fbb7ff999d119f2a9f4f50d2ecd0358533196a6
+Contract Address: 0x9CBF37164E2CB7B21Efeb0Fe9C4DcF97E1fE1c26
+Block: 26258905
+Paid: 21.360663 ETH (4746814 gas * 4500 gwei)
+
+
+##### 88882
+✅  [Success] Hash: 0x7653718519da25cba0ddee7ebf54f56b4eeea7351eb79e1ff4fe62a6644f5c11
+Contract Address: 0x73Bc482E442DFf2E2667Fc9D1e9563E6Ed65B9EE
+Block: 26258904
+Paid: 23.919264 ETH (5315392 gas * 4500 gwei)
+
+⠈ Sequence #1 on 88882 | Waiting for pending transactions
+    ⠠ [Pending] 0x7c17df4b316c1c0a718012364bb6d90f89d0cfeec27f53785e5ae8bf1e29ac7a
+    ⠐ [Pending] 0xf341679ced785573360cab14c69a9831da4c69e2ed976e79606a9b533a7653be
+⠈ Sequence #1 on 88882 | Waiting for pending transactions
+    ⠐ [Pending] 0x7c17df4b316c1c0a718012364bb6d90f89d0cfeec27f53785e5ae8bf1e29ac7a
+    ⠁ [Pending] 0xf341679ced785573360cab14c69a9831da4c69e2ed976e79606a9b533a7653be
+
+##### 88882
+✅  [Success] Hash: 0xf341679ced785573360cab14c69a9831da4c69e2ed976e79606a9b533a7653be
+Block: 26258905
+Paid: 0.2081745 ETH (46261 gas * 4500 gwei)
+
+
+##### 88882
+✅  [Success] Hash: 0x7c17df4b316c1c0a718012364bb6d90f89d0cfeec27f53785e5ae8bf1e29ac7a
+Contract Address: 0x092D49d558058e4DA8951CFf020282a0075Af313
+Block: 26258905
+Paid: 9.2165805 ETH (2048129 gas * 4500 gwei)
+
+✅ Sequence #1 on 88882 | Total Paid: 18.06681013145224192 ETH (24511229 gas * avg 4500 gwei)
+                                                                                                                                                               
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: /Users/olivmath/dev/fanify-v2/smartcontract/broadcast/Deploy.s.sol/88882/run-latest.json
+
+Sensitive values saved to: /Users/olivmath/dev/fanify-v2/smartcontract/cache/Deploy.s.sol/88882/run-latest.json

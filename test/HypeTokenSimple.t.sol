@@ -29,15 +29,15 @@ contract HypeTokenSimpleTest is Test {
 
         // All transfer functions should revert
         vm.prank(user1);
-        vm.expectRevert("HYPE tokens are non-transferable");
+        vm.expectRevert(bytes("E060"));
         hypeToken.transfer(user2, 1000e18);
 
         vm.prank(user1);
-        vm.expectRevert("HYPE tokens are non-transferable");
+        vm.expectRevert(bytes("E060"));
         hypeToken.transferFrom(user1, user2, 1000e18);
 
         vm.prank(user1);
-        vm.expectRevert("HYPE tokens are non-transferable");
+        vm.expectRevert(bytes("E060"));
         hypeToken.approve(user2, 1000e18);
     }
 
@@ -58,7 +58,7 @@ contract HypeTokenSimpleTest is Test {
         assertEq(hypeToken.balanceOf(user1), 1000e18);
 
         vm.prank(user1);
-        vm.expectRevert("Only owner can call this function");
+        vm.expectRevert(bytes("E000"));
         hypeToken.mint(user2, 1000e18);
     }
 }

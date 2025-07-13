@@ -86,7 +86,7 @@ contract Fase2Cenario2Test is BaseSetup {
                 assertGt(ganho, 0, "Winner sem ganho");
             } else {
                 vm.prank(apostadores[i]);
-                vm.expectRevert(bytes("E008")); // Espera revert porque perdeu
+                vm.expectRevert(bytes("E025")); // Espera revert porque perdeu
                 funify.claimPrize(0x12345678);
             }
         }

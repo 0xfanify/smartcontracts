@@ -125,7 +125,7 @@ contract ReentrancyTest is Test {
         uint256 balanceAfter = token.balanceOf(attacker);
         assertGt(balanceAfter, balanceBefore, "First claim should work");
         vm.prank(attacker);
-        vm.expectRevert(bytes("E010")); // NoBetOnMatch error
+        vm.expectRevert(bytes("E020")); // NoBetOnMatch error
         funify.claimPrize(0x12345678);
     }
 
@@ -138,7 +138,7 @@ contract ReentrancyTest is Test {
         oracle.updateScore(0x12345678, 2, 1);
         // Não avançar para depois do fim
         vm.prank(attacker);
-        vm.expectRevert(bytes("E005")); // MatchNotFinished error
+        vm.expectRevert(bytes("E021")); // MatchNotFinished error
         funify.claimPrize(0x12345678);
     }
 
@@ -151,7 +151,7 @@ contract ReentrancyTest is Test {
         oracle.updateScore(0x12345678, 1, 1);
         vm.warp(startTimestamp + duration + 1);
         vm.prank(attacker);
-        vm.expectRevert(bytes("E006")); // MatchEndedInDraw error
+        vm.expectRevert(bytes("E026")); // MatchEndedInDraw error
         funify.claimPrize(0x12345678);
     }
 
@@ -164,7 +164,7 @@ contract ReentrancyTest is Test {
         oracle.updateScore(0x12345678, 0, 1);
         vm.warp(startTimestamp + duration + 1);
         vm.prank(attacker);
-        vm.expectRevert(bytes("E008")); // UserDidNotWin error
+        vm.expectRevert(bytes("E025")); // UserDidNotWin error
         funify.claimPrize(0x12345678);
     }
 

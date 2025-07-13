@@ -124,11 +124,11 @@ contract Fase0Cenario0Test is BaseSetup {
 
         // Apostadores do Time B não recebem nada
         vm.prank(apostador2);
-        vm.expectRevert(bytes("E008")); // Espera revert porque apostador2 perdeu
+        vm.expectRevert(bytes("E025")); // Espera revert porque apostador2 perdeu
         funify.claimPrize(0x11111111);
 
         vm.prank(apostador4);
-        vm.expectRevert(bytes("E008")); // Espera revert porque apostador4 perdeu
+        vm.expectRevert(bytes("E025")); // Espera revert porque apostador4 perdeu
         funify.claimPrize(0x11111111);
     }
 }

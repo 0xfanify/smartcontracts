@@ -33,6 +33,9 @@
 - [ ] no fim da tempoda o Usuário pode fazer unstake a qualquer momento.
 
 ---
+Renomei TUDO de timeA/timeB para em Home/Away 
+
+---
 
 # Claim Bug Fix
 

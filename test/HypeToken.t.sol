@@ -45,7 +45,7 @@ contract HypeTokenTest is Test {
 
         // Try to transfer tokens
         vm.prank(user1);
-        vm.expectRevert("HYPE tokens are non-transferable");
+        vm.expectRevert(abi.encodeWithSignature("Error(string)", "E060"));
         hypeToken.transfer(user2, 1000e18);
     }
 
@@ -56,7 +56,7 @@ contract HypeTokenTest is Test {
 
         // Try to transferFrom tokens
         vm.prank(user2);
-        vm.expectRevert("HYPE tokens are non-transferable");
+        vm.expectRevert(abi.encodeWithSignature("Error(string)", "E060"));
         hypeToken.transferFrom(user1, user2, 1000e18);
     }
 
@@ -67,7 +67,7 @@ contract HypeTokenTest is Test {
 
         // Try to approve tokens
         vm.prank(user1);
-        vm.expectRevert("HYPE tokens are non-transferable");
+        vm.expectRevert(abi.encodeWithSignature("Error(string)", "E060"));
         hypeToken.approve(user2, 1000e18);
     }
 
@@ -77,7 +77,7 @@ contract HypeTokenTest is Test {
         hypeToken.stake{value: 1 ether}();
 
         vm.prank(user1);
-        vm.expectRevert("HYPE tokens are non-transferable");
+        vm.expectRevert(bytes("E060"));
         hypeToken.transfer(address(0), 1000e18);
     }
 
@@ -95,7 +95,7 @@ contract HypeTokenTest is Test {
 
         // Try to transfer zero amount
         vm.prank(user1);
-        vm.expectRevert("HYPE tokens are non-transferable");
+        vm.expectRevert(bytes("E060"));
         hypeToken.transfer(user2, 0);
     }
 
@@ -112,7 +112,7 @@ contract HypeTokenTest is Test {
         address fanifyContract = makeAddr("fanify");
 
         vm.prank(user1);
-        vm.expectRevert("Only owner can call this function");
+        vm.expectRevert(bytes("E000"));
         hypeToken.setFanifyContract(fanifyContract);
     }
 
@@ -211,7 +211,7 @@ contract HypeTokenTest is Test {
 
     function test_StakeInsufficientETH() public {
         vm.prank(user1);
-        vm.expectRevert("Not enough ETH");
+        vm.expectRevert(bytes("E017"));
         hypeToken.stake{value: 0.5 ether}();
     }
 
@@ -265,13 +265,13 @@ contract HypeTokenTest is Test {
 
     function test_UnstakeInsufficientBalance() public {
         vm.prank(user1);
-        vm.expectRevert("Insufficient balance to unstake");
+        vm.expectRevert(bytes("E018"));
         hypeToken.unstake(1000e18);
     }
 
     function test_UnstakeZeroAmount() public {
         vm.prank(user1);
-        vm.expectRevert("Cannot unstake zero amount");
+        vm.expectRevert(bytes("E019"));
         hypeToken.unstake(0);
     }
 
@@ -282,7 +282,7 @@ contract HypeTokenTest is Test {
 
         // Try to unstake less than 1000 tokens (which would result in 0 ETH)
         vm.prank(user1);
-        vm.expectRevert("Amount too small to unstake");
+        vm.expectRevert(bytes("E061"));
         hypeToken.unstake(999);
     }
 
@@ -313,17 +313,17 @@ contract HypeTokenTest is Test {
 
     function test_MintByNonOwner() public {
         vm.prank(user1);
-        vm.expectRevert("Only owner can call this function");
+        vm.expectRevert(bytes("E000"));
         hypeToken.mint(user2, 1000e18);
     }
 
     function test_MintToZeroAddress() public {
-        vm.expectRevert("Cannot mint to zero address");
+        vm.expectRevert(bytes("E064"));
         hypeToken.mint(address(0), 1000e18);
     }
 
     function test_MintZeroAmount() public {
-        vm.expectRevert("Cannot mint zero amount");
+        vm.expectRevert(bytes("E065"));
         hypeToken.mint(user1, 0);
     }
 

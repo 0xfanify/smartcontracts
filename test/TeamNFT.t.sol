@@ -71,7 +71,7 @@ contract TeamNFTTest is Test {
 
     function test_MintTo_OnlyStakeContract() public {
         vm.prank(user);
-        vm.expectRevert("Only stake contract can call this");
+        vm.expectRevert(bytes("E001"));
         nft.mintTo(user, 1, 2025);
     }
 
@@ -103,7 +103,7 @@ contract TeamNFTTest is Test {
     }
 
     function test_GetMetadata_NonExistentToken() public {
-        vm.expectRevert("Token does not exist");
+        vm.expectRevert(bytes("E042"));
         nft.getMetadata(999);
     }
 
@@ -120,7 +120,7 @@ contract TeamNFTTest is Test {
         vm.expectRevert();
         nft.ownerOf(tokenId);
 
-        vm.expectRevert("Token does not exist");
+        vm.expectRevert(bytes("E042"));
         nft.getMetadata(tokenId);
     }
 
@@ -129,7 +129,7 @@ contract TeamNFTTest is Test {
         nft.mintTo(user, 1, 2025);
 
         vm.prank(user);
-        vm.expectRevert("Only stake contract can call this");
+        vm.expectRevert(bytes("E001"));
         nft.burn(1);
     }
 
@@ -145,7 +145,7 @@ contract TeamNFTTest is Test {
         uint256 tokenId = nft.mintTo(user, 1, 2025);
 
         vm.prank(user);
-        vm.expectRevert("Transfers disabled");
+        vm.expectRevert(bytes("E043"));
         nft.transferFrom(user, user2, tokenId);
     }
 
@@ -154,7 +154,7 @@ contract TeamNFTTest is Test {
         uint256 tokenId = nft.mintTo(user, 1, 2025);
 
         vm.prank(user);
-        vm.expectRevert("Transfers disabled");
+        vm.expectRevert(bytes("E043"));
         nft.safeTransferFrom(user, user2, tokenId);
     }
 
@@ -163,7 +163,7 @@ contract TeamNFTTest is Test {
         uint256 tokenId = nft.mintTo(user, 1, 2025);
 
         vm.prank(user);
-        vm.expectRevert("Transfers disabled");
+        vm.expectRevert(bytes("E043"));
         nft.safeTransferFrom(user, user2, tokenId, "");
     }
 
@@ -172,7 +172,7 @@ contract TeamNFTTest is Test {
         uint256 tokenId = nft.mintTo(user, 1, 2025);
 
         vm.prank(user);
-        vm.expectRevert("Transfers disabled");
+        vm.expectRevert(bytes("E043"));
         nft.approve(user2, tokenId);
     }
 
@@ -181,7 +181,7 @@ contract TeamNFTTest is Test {
         nft.mintTo(user, 1, 2025);
 
         vm.prank(user);
-        vm.expectRevert("Transfers disabled");
+        vm.expectRevert(bytes("E043"));
         nft.setApprovalForAll(user2, true);
     }
 
@@ -207,7 +207,7 @@ contract TeamNFTTest is Test {
     }
 
     function test_TokenURI_NonExistentToken() public {
-        vm.expectRevert("Token does not exist");
+        vm.expectRevert(bytes("E042"));
         nft.tokenURI(999);
     }
 

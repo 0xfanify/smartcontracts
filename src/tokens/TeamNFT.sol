@@ -4,8 +4,9 @@ pragma solidity ^0.8.20;
 import {ERC721} from "lib/solady/src/tokens/ERC721.sol";
 import {Ownable} from "lib/solady/src/auth/Ownable.sol";
 import {LibString} from "lib/solady/src/utils/LibString.sol";
+import {Errors} from "../errors/Errors.sol";
 
-contract TeamNFT is ERC721, Ownable {
+contract TeamNFT is ERC721, Ownable, Errors {
     using LibString for uint256;
 
     struct Metadata {
@@ -21,7 +22,7 @@ contract TeamNFT is ERC721, Ownable {
 
     modifier onlyStakeContract() {
         if (msg.sender != stakeContract) {
-            revert("Only stake contract can call this");
+            revert(NotStakeContract);
         }
         _;
     }
@@ -56,7 +57,7 @@ contract TeamNFT is ERC721, Ownable {
 
     function getMetadata(uint256 tokenId) external view returns (uint256 teamId, uint256 seasonId) {
         if (!_exists(tokenId)) {
-            revert("Token does not exist");
+            revert(TokenDoesNotExistError);
         }
         Metadata memory data = _tokenMetadata[tokenId];
         return (data.teamId, data.seasonId);
@@ -66,23 +67,23 @@ contract TeamNFT is ERC721, Ownable {
     // Override transfer & approve functions to disable transfers
     // ------------------------------
     function approve(address, uint256) public payable override {
-        revert("Transfers disabled");
+        revert(TransfersDisabled);
     }
 
     function setApprovalForAll(address, bool) public pure override {
-        revert("Transfers disabled");
+        revert(TransfersDisabled);
     }
 
     function transferFrom(address, address, uint256) public payable override {
-        revert("Transfers disabled");
+        revert(TransfersDisabled);
     }
 
     function safeTransferFrom(address, address, uint256) public payable override {
-        revert("Transfers disabled");
+        revert(TransfersDisabled);
     }
 
     function safeTransferFrom(address, address, uint256, bytes calldata) public payable override {
-        revert("Transfers disabled");
+        revert(TransfersDisabled);
     }
 
     // ------------------------------
@@ -90,7 +91,7 @@ contract TeamNFT is ERC721, Ownable {
     // ------------------------------
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (!_exists(tokenId)) {
-            revert("Token does not exist");
+            revert(TokenDoesNotExistError);
         }
         return _tokenURIs[tokenId];
     }

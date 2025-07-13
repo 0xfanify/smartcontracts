@@ -68,7 +68,7 @@ contract Fase1Cenario3Test is BaseSetup {
         vm.warp(startTimestamp + 1);
 
         // Try to place a bet after match is closed - should revert
-        vm.expectRevert(bytes("E009"));
+        vm.expectRevert(bytes("E022"));
         vm.prank(apostadores[0]);
         funify.placeBet(0x12345678, true, 100 ether);
     }

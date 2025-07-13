@@ -69,7 +69,7 @@ contract Fase1Cenario4Test is BaseSetup {
 
         // Tentar claim antes do fim do jogo - deve falhar
         vm.prank(apostadores[0]);
-        vm.expectRevert(bytes("E005")); // MatchNotFinished
+        vm.expectRevert(bytes("E021")); // MatchNotFinished
         funify.claimPrize(0x12345678);
     }
 }

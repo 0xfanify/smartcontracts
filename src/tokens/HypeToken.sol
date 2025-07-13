@@ -2,11 +2,13 @@
 pragma solidity ^0.8.20;
 
 import "solady/tokens/ERC20.sol";
+import {Errors} from "../errors/Errors.sol";
 
-contract HypeToken is ERC20 {
+contract HypeToken is ERC20, Errors {
     address public owner;
     bool private _locked;
     address public fanifyContract;
+    address public seasonfyContract;
 
     // Events
     event TokensStaked(address indexed user, uint256 ethAmount, uint256 tokensMinted);
@@ -15,12 +17,12 @@ contract HypeToken is ERC20 {
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can call this function");
+        require(msg.sender == owner, NotOwner);
         _;
     }
 
     modifier nonReentrant() {
-        require(!_locked, "Reentrant call");
+        require(!_locked, ReentrantCall);
         _locked = true;
         _;
         _locked = false;
@@ -33,6 +35,10 @@ contract HypeToken is ERC20 {
 
     function setFanifyContract(address _fanifyContract) external onlyOwner {
         fanifyContract = _fanifyContract;
+    }
+
+    function setSeasonfyContract(address _seasonfyContract) external onlyOwner {
+        seasonfyContract = _seasonfyContract;
     }
 
     function name() public pure override returns (string memory) {
@@ -52,26 +58,26 @@ contract HypeToken is ERC20 {
         if (msg.sender == fanifyContract || to == fanifyContract) {
             return super.transfer(to, amount);
         }
-        revert("HYPE tokens are non-transferable");
+        revert(NonTransferable);
     }
 
     function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
         if (msg.sender == fanifyContract || from == fanifyContract || to == fanifyContract) {
             return super.transferFrom(from, to, amount);
         }
-        revert("HYPE tokens are non-transferable");
+        revert(NonTransferable);
     }
 
     function approve(address spender, uint256 amount) public override returns (bool) {
         if (spender == fanifyContract) {
             return super.approve(spender, amount);
         }
-        revert("HYPE tokens are non-transferable");
+        revert(NonTransferable);
     }
 
     function stake() public payable nonReentrant {
         if (msg.value < 1 ether) {
-            revert("Not enough ETH");
+            revert(NotEnoughETH);
         }
         // // Check for overflow
         // if (msg.value > type(uint256).max / 1000) {
@@ -85,17 +91,17 @@ contract HypeToken is ERC20 {
 
     function unstake(uint256 _amount) public nonReentrant {
         if (_amount > balanceOf(msg.sender)) {
-            revert("Insufficient balance to unstake");
+            revert(InsufficientBalanceToUnstake);
         }
         if (_amount == 0) {
-            revert("Cannot unstake zero amount");
+            revert(CannotUnstakeZero);
         }
         uint256 ethToReturn = _amount / 1000;
         if (ethToReturn == 0) {
-            revert("Amount too small to unstake");
+            revert(AmountTooSmall);
         }
         if (address(this).balance < ethToReturn) {
-            revert("Insufficient contract balance");
+            revert(InsufficientContractBalance);
         }
 
         // Burn tokens first to prevent reentrancy
@@ -103,14 +109,22 @@ contract HypeToken is ERC20 {
 
         (bool success,) = payable(msg.sender).call{value: ethToReturn}("");
         if (!success) {
-            revert("ETH transfer failed");
+            revert(ETHTransferFailed);
         }
         emit TokensUnstaked(msg.sender, _amount, ethToReturn);
     }
 
     function mint(address to, uint256 amount) external onlyOwner {
-        require(to != address(0), "Cannot mint to zero address");
-        require(amount > 0, "Cannot mint zero amount");
+        require(to != address(0), CannotMintToZero);
+        require(amount > 0, CannotMintZero);
+        _mint(to, amount);
+        emit TokensMinted(to, amount, msg.sender);
+    }
+
+    function mintBySeasonfy(address to, uint256 amount) external {
+        require(msg.sender == seasonfyContract, NotOwner);
+        require(to != address(0), CannotMintToZero);
+        require(amount > 0, CannotMintZero);
         _mint(to, amount);
         emit TokensMinted(to, amount, msg.sender);
     }

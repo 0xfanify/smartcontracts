@@ -11,12 +11,12 @@ abstract contract SeasonfyClaim is SeasonfyPlaceBet {
      * @dev Função para reivindicar prêmio
      * @param hypeId ID do jogo
      */
-    function claimPrize(bytes4 hypeId)
+    function claimPrize(uint256 seasonId, bytes4 hypeId)
         external
         onlyMatchFinished(hypeId)
         onlyNoDraw(hypeId)
         onlyUserWon(hypeId)
-        onlyValidClaim(hypeId)
+        onlyValidClaim(seasonId, hypeId)
     {
         uint256 userPrize = _processClaim(hypeId);
         _transferPrize(msg.sender, userPrize);
@@ -48,7 +48,7 @@ abstract contract SeasonfyClaim is SeasonfyPlaceBet {
     }
 
     function _getMatchOdds(bytes4 hypeId) internal view returns (bool teamAWon, uint256 oddsA, uint256 oddsB) {
-        (uint256 hypeA, uint256 hypeB, uint8 goalsA, uint8 goalsB, , , , ,) = oracle.getMatch(hypeId);
+        (uint256 hypeA, uint256 hypeB, uint8 goalsA, uint8 goalsB, , , , , ,) = oracle.getMatch(hypeId);
         teamAWon = goalsA > goalsB;
         oddsA = _getOdds(hypeA, hypeB, true);
         oddsB = _getOdds(hypeA, hypeB, false);

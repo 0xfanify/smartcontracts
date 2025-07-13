@@ -12,20 +12,62 @@ abstract contract OracleCrud is OracleSec {
         FINISHED     // Jogo finalizado
     }
 
-    // 1. Criar um Jogo
+    // 1. Criar uma nova temporada
+    function createSeason(uint256 seasonId, uint256 startTimestamp, uint256 endTimestamp)
+        public
+        onlyOwner
+    {
+        if (seasons[seasonId].seasonId != 0) revert(InvalidSeasonId);
+        if (startTimestamp >= endTimestamp) revert(InvalidTimestamp);
+        if (startTimestamp <= block.timestamp) revert(InvalidTimestamp);
+
+        seasons[seasonId] = Season({
+            seasonId: seasonId,
+            startTimestamp: startTimestamp,
+            endTimestamp: endTimestamp,
+            isActive: true
+        });
+
+        seasonIds.push(seasonId);
+        emit SeasonCreated(seasonId, startTimestamp, endTimestamp);
+    }
+
+    // 2. Finalizar uma temporada
+    function endSeason(uint256 seasonId) public onlyOwner {
+        Season storage season = seasons[seasonId];
+        if (season.seasonId == 0) revert(InvalidSeasonId);
+        if (!season.isActive) revert(InvalidState);
+
+        season.isActive = false;
+        emit SeasonEnded(seasonId);
+    }
+
+    // 3. Atualizar temporada atual
+    function setCurrentSeason(uint256 seasonId) public onlyOwner {
+        if (seasons[seasonId].seasonId == 0) revert(InvalidSeasonId);
+        if (!seasons[seasonId].isActive) revert(InvalidState);
+
+        currentSeasonId = seasonId;
+        emit CurrentSeasonUpdated(seasonId);
+    }
+
+    // 4. Criar um Jogo (agora com seasonId)
     function scheduleMatch(
+        uint256 seasonId,
         bytes4 hypeId,
         string memory teamAAbbreviation,
         string memory teamBAbbreviation,
         string memory hashtag
     ) public onlyOwner {
         if (matchHypes[hypeId].startTimestamp != 0) revert(MatchAlreadyFinished);
+        if (seasons[seasonId].seasonId == 0) revert(InvalidSeasonId);
+        if (!seasons[seasonId].isActive) revert(InvalidState);
         if (bytes(teamAAbbreviation).length == 0) revert(InvalidTeamAbbreviation);
         if (bytes(teamBAbbreviation).length == 0) revert(InvalidTeamAbbreviation);
         if (bytes(hashtag).length == 0) revert(OracleCallFailed);
 
-        // Usar o timestamp atual como startTimestamp
-        uint256 startTimestamp = block.timestamp;
+        // Usar um timestamp futuro (1 hora a partir de agora) como startTimestamp
+        uint256 startTimestamp = block.timestamp + 3600; // 1 hora no futuro
 
         matchHypes[hypeId] = MatchHype({
             startTimestamp: startTimestamp,
@@ -36,18 +78,19 @@ abstract contract OracleCrud is OracleSec {
             goalsB: 0,
             teamAAbbreviation: teamAAbbreviation,
             teamBAbbreviation: teamBAbbreviation,
-            hashtag: hashtag
+            hashtag: hashtag,
+            seasonId: seasonId
         });
 
         hypeIds.push(hypeId);
-        emit MatchScheduled(hypeId, startTimestamp, GAME_TIME);
+        emit MatchScheduled(hypeId, seasonId, startTimestamp, GAME_TIME);
     }
 
-    // 2. Alimentar esse jogo com hype (hype A, hype B)
+    // 5. Alimentar esse jogo com hype (hype A, hype B)
     function updateHype(bytes4 hypeId, uint256 HypeA, uint256 HypeB)
         public
         onlyOwner
-        onlyMatchExists(hypeId)
+    
     {
         MatchHype storage matchHype = matchHypes[hypeId];
         if (block.timestamp >= matchHype.startTimestamp) revert(InvalidMatchStatus); // Só pode antes do início
@@ -57,7 +100,7 @@ abstract contract OracleCrud is OracleSec {
         emit HypeUpdated(hypeId, HypeA, HypeB);
     }
 
-    // 3. Atualizar o placar do jogo (golA, golB)
+    // 6. Atualizar o placar do jogo (golA, golB)
     function updateScore(bytes4 hypeId, uint8 goalsA, uint8 goalsB)
         public
         onlyOwner
@@ -104,22 +147,32 @@ abstract contract OracleCrud is OracleSec {
         return matchHypes[hypeId].gameTime;
     }
 
-    // CRUD para seasonEndTimestamp
-    function updateSeasonEndTimestamp(uint256 newSeasonEndTimestamp)
-        public
-        onlyOwner
-    {
-        if (newSeasonEndTimestamp <= block.timestamp) revert(OracleCallFailed);
-        seasonEndTimestamp = newSeasonEndTimestamp;
+    // CRUD para temporadas
+    function getSeason(uint256 seasonId) public view returns (Season memory) {
+        return seasons[seasonId];
     }
 
-    function getSeasonEndTimestamp() public view returns (uint256) {
-        return seasonEndTimestamp;
+    function getCurrentSeason() public view returns (Season memory) {
+        return seasons[currentSeasonId];
     }
 
-    // Função para verificar se a temporada terminou
+    function getAllSeasonIds() public view returns (uint256[] memory) {
+        return seasonIds;
+    }
+
+    function isSeasonActive(uint256 seasonId) public view returns (bool) {
+        Season storage season = seasons[seasonId];
+        return season.isActive && block.timestamp >= season.startTimestamp && block.timestamp < season.endTimestamp;
+    }
+
+    function isSeasonEnded(uint256 seasonId) public view returns (bool) {
+        Season storage season = seasons[seasonId];
+        return block.timestamp >= season.endTimestamp;
+    }
+
+    // Função para verificar se a temporada atual terminou (mantida para compatibilidade)
     function isSeasonEnded() public view returns (bool) {
-        return block.timestamp >= seasonEndTimestamp;
+        return isSeasonEnded(currentSeasonId);
     }
 
     // CRUD para startTimestamp (mantido para compatibilidade)

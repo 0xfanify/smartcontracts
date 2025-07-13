@@ -17,7 +17,8 @@ abstract contract OracleQuery is OracleCrud {
             uint256 gameTime,
             string memory teamAAbbreviation,
             string memory teamBAbbreviation,
-            string memory hashtag
+            string memory hashtag,
+            uint256 seasonId
         )
     {
         MatchHype memory matchHype = matchHypes[hypeId];
@@ -32,7 +33,8 @@ abstract contract OracleQuery is OracleCrud {
             matchHype.gameTime,
             matchHype.teamAAbbreviation,
             matchHype.teamBAbbreviation,
-            matchHype.hashtag
+            matchHype.hashtag,
+            matchHype.seasonId
         );
     }
 
@@ -64,5 +66,26 @@ abstract contract OracleQuery is OracleCrud {
             }
         }
         revert(MatchNotFound);
+    }
+
+    // Função para obter todos os jogos de uma temporada
+    function getMatchesBySeason(uint256 seasonId) public view returns (bytes4[] memory) {
+        bytes4[] memory seasonMatches = new bytes4[](hypeIds.length);
+        uint256 count = 0;
+        
+        for (uint256 i = 0; i < hypeIds.length; i++) {
+            if (matchHypes[hypeIds[i]].seasonId == seasonId) {
+                seasonMatches[count] = hypeIds[i];
+                count++;
+            }
+        }
+        
+        // Redimensionar array para o tamanho correto
+        bytes4[] memory result = new bytes4[](count);
+        for (uint256 i = 0; i < count; i++) {
+            result[i] = seasonMatches[i];
+        }
+        
+        return result;
     }
 } 

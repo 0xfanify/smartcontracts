@@ -58,8 +58,14 @@ contract ReentrancyTest is Test {
         // Configurar token
         token.setFanifyContract(address(funify));
 
+        // Usar a temporada atual criada automaticamente pelo Oracle
+        uint256 seasonId = oracle.currentSeasonId();
+        
+        // Avançar o tempo para garantir que estamos no futuro
+        vm.warp(block.timestamp + 100);
+        
         // Configurar partida
-        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(seasonId, 0x12345678, "AAA", "BBB", "#aaa_bbb");
         uint256 startTimestamp = oracle.getStartTimestamp(0x12345678);
         uint256 duration = oracle.getGameTime(0x12345678);
         oracle.updateHype(0x12345678, 7000, 3000);
@@ -84,7 +90,7 @@ contract ReentrancyTest is Test {
     }
 
     function test_ClaimReentrancyVulnerability() public {
-        (uint256 startTimestamp, uint256 duration) = getTimestamps();
+        (uint256 startTimestamp,) = getTimestamps();
         // Avançar para antes do início para apostar
         vm.warp(startTimestamp - 10);
         vm.prank(attacker);
@@ -95,7 +101,8 @@ contract ReentrancyTest is Test {
         oracle.updateScore(0x12345678, 2, 1);
 
         // Avançar para depois do fim do jogo para claim
-        vm.warp(startTimestamp + duration + 1);
+        (uint256 startTimestamp2, uint256 duration) = getTimestamps();
+        vm.warp(startTimestamp2 + duration + 1);
         // Criar contrato atacante
         ReentrancyAttacker attackerContract = new ReentrancyAttacker(funify, 0x12345678);
 

@@ -66,6 +66,7 @@ contract SeasonfyTest is Test {
     function test_StakeFanToken() public {
         uint256 stakeAmount = 100e18;
         uint256 teamId = 1;
+        uint256 seasonId = oracle.currentSeasonId();
         
         // Approve fan token
         vm.prank(user1);
@@ -73,21 +74,18 @@ contract SeasonfyTest is Test {
         
         // Stake fan token
         vm.prank(user1);
-        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId);
+        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId, seasonId);
         
         // Check stake info
-        (uint256 fanTokenAmount, uint256 hypeAmount, uint256 stakedTeamId, uint256 seasonId, uint256 nftTokenId, uint256 stakedAt) = seasonfy.getStakeInfo(user1);
-        
+        (uint256 fanTokenAmount, uint256 hypeAmount, uint256 stakedTeamId, uint256 stakedSeasonId, uint256 nftTokenId, uint256 stakedAt) = seasonfy.getStakeInfo(user1);
         assertEq(fanTokenAmount, stakeAmount);
         assertEq(stakedTeamId, teamId);
-        assertEq(seasonId, 1);
+        assertEq(stakedSeasonId, seasonId);
         assertEq(nftTokenId, 1);
         assertEq(stakedAt, block.timestamp);
-        
         // Check HYPE was minted (1000 HYPE = 1 USD, então 100 tokens = 100.000 HYPE)
         assertEq(hypeAmount, 100000e18);
         assertEq(hypeToken.balanceOf(user1), 100000e18);
-        
         // Check NFT was minted
         assertEq(teamNFT.ownerOf(1), user1);
     }
@@ -95,30 +93,32 @@ contract SeasonfyTest is Test {
     function test_CannotStakeTwice() public {
         uint256 stakeAmount = 100e18;
         uint256 teamId = 1;
+        uint256 seasonId = oracle.currentSeasonId();
         
         // First stake
         vm.prank(user1);
         MockERC20(mockFanToken).approve(address(seasonfy), stakeAmount);
         vm.prank(user1);
-        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId);
+        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId, seasonId);
         
         // Try to stake again
         vm.prank(user1);
         MockERC20(mockFanToken).approve(address(seasonfy), stakeAmount);
         vm.prank(user1);
         vm.expectRevert();
-        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId);
+        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId, seasonId);
     }
 
     function test_CannotUnstakeBeforeSeasonEnd() public {
         uint256 stakeAmount = 100e18;
         uint256 teamId = 1;
+        uint256 seasonId = oracle.currentSeasonId();
         
         // Stake
         vm.prank(user1);
         MockERC20(mockFanToken).approve(address(seasonfy), stakeAmount);
         vm.prank(user1);
-        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId);
+        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId, seasonId);
         
         // Try to unstake before season end
         vm.prank(user1);
@@ -129,15 +129,19 @@ contract SeasonfyTest is Test {
     function test_PlaceBet() public {
         uint256 stakeAmount = 100e18;
         uint256 teamId = 1;
+        uint256 seasonId = oracle.currentSeasonId();
         
         // Stake fan token
         vm.prank(user1);
         MockERC20(mockFanToken).approve(address(seasonfy), stakeAmount);
         vm.prank(user1);
-        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId);
+        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId, seasonId);
+        
+        // Avançar o tempo para garantir que estamos no futuro
+        vm.warp(block.timestamp + 100);
         
         // Schedule match
-        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(seasonId, 0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
         
         // Approve HYPE for betting
@@ -146,26 +150,31 @@ contract SeasonfyTest is Test {
         
         // Place bet (only for team A, as per modifier)
         vm.prank(user1);
-        seasonfy.placeBet(0x12345678, true, 100e18);
+        seasonfy.placeBet(seasonId, 0x12345678, true, 100e18);
         
         // Check bet was placed
-        (uint256 amount, bool teamA) = seasonfy.bets(0x12345678, user1);
+        (uint256 amount, bool teamA, uint256 betSeasonId) = seasonfy.bets(0x12345678, user1);
         assertEq(amount, 100e18);
         assertTrue(teamA);
+        assertEq(betSeasonId, seasonId);
     }
 
     function test_CannotBetAgainstTeam() public {
         uint256 stakeAmount = 100e18;
         uint256 teamId = 1;
+        uint256 seasonId = oracle.currentSeasonId();
         
         // Stake fan token
         vm.prank(user1);
         MockERC20(mockFanToken).approve(address(seasonfy), stakeAmount);
         vm.prank(user1);
-        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId);
+        seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId, seasonId);
+        
+        // Avançar o tempo para garantir que estamos no futuro
+        vm.warp(block.timestamp + 100);
         
         // Schedule match
-        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(seasonId, 0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
         
         // Approve HYPE for betting
@@ -175,7 +184,7 @@ contract SeasonfyTest is Test {
         // Try to bet against team (should fail)
         vm.prank(user1);
         vm.expectRevert();
-        seasonfy.placeBet(0x12345678, false, 100e18);
+        seasonfy.placeBet(seasonId, 0x12345678, false, 100e18);
     }
 }
 

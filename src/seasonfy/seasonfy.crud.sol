@@ -9,7 +9,7 @@ abstract contract SeasonfyCrud is SeasonfySec {
         SeasonfySec(_token, _oracle, _teamNFT, _mockFanX) {}
 
     function getOdds(bytes4 hypeId) public view returns (uint256 oddsA, uint256 oddsB) {
-        (uint256 hypeA, uint256 hypeB, , , , , , ,) = oracle.getMatch(hypeId);
+        (uint256 hypeA, uint256 hypeB, , , , , , , ,) = oracle.getMatch(hypeId);
         if (hypeA + hypeB == 0) {
             revert(InvalidHypeValues);
         }
@@ -44,7 +44,8 @@ abstract contract SeasonfyCrud is SeasonfySec {
     }
 
     function getSeasonInfo() external view returns (uint256 endTimestamp, uint256 duration) {
-        return (oracle.getSeasonEndTimestamp(), oracle.SEASON_TIME());
+        OracleStorage.Season memory season = oracle.getCurrentSeason();
+        return (season.endTimestamp, season.endTimestamp - season.startTimestamp);
     }
 
     function isSeasonEnded() external view returns (bool) {

@@ -23,6 +23,20 @@ abstract contract OracleStorage is OracleError, OracleEvents {
     uint256 public constant GAME_TIME = 7200; // 2 horas em segundos
     uint256 public constant SEASON_TIME = 5256000; // 2 meses em segundos (60 dias)
 
+    /**
+     * @dev Estrutura para rastrear temporadas
+     * @param seasonId ID único da temporada
+     * @param startTimestamp Timestamp de início da temporada
+     * @param endTimestamp Timestamp de fim da temporada
+     * @param isActive Se a temporada está ativa
+     */
+    struct Season {
+        uint256 seasonId;
+        uint256 startTimestamp;
+        uint256 endTimestamp;
+        bool isActive;
+    }
+
     struct MatchHype {
         uint256 HypeA;
         uint256 HypeB;
@@ -33,13 +47,16 @@ abstract contract OracleStorage is OracleError, OracleEvents {
         string teamAAbbreviation; // Sigla do Time A (ex: "PSG", "REAL")
         string teamBAbbreviation; // Sigla do Time B (ex: "BAR", "JUV")
         string hashtag;
+        uint256 seasonId; // ID da temporada à qual o jogo pertence
     }
 
     mapping(bytes4 hypeId => MatchHype) public matchHypes;
     bytes4[] public hypeIds; // Lista de todos os hypeIds
 
-    // Configurações de temporada
-    uint256 public seasonEndTimestamp; // Timestamp do fim da temporada atual
+    // Mappings para temporadas
+    mapping(uint256 => Season) public seasons; // Temporadas por seasonId
+    uint256[] public seasonIds; // Lista de todos os seasonIds
+    uint256 public currentSeasonId; // ID da temporada atual
 
     /**
      * @dev Construtor que inicializa os contratos externos
@@ -48,7 +65,15 @@ abstract contract OracleStorage is OracleError, OracleEvents {
     constructor(address _mockAzuro) {
         owner = msg.sender;
         mockAzuro = MockAzuro(_mockAzuro);
-        // Inicializa a temporada atual
-        seasonEndTimestamp = block.timestamp + SEASON_TIME;
+        
+        // Criar a primeira temporada automaticamente
+        currentSeasonId = 1;
+        seasons[currentSeasonId] = Season({
+            seasonId: currentSeasonId,
+            startTimestamp: block.timestamp,
+            endTimestamp: block.timestamp + SEASON_TIME,
+            isActive: true
+        });
+        seasonIds.push(currentSeasonId);
     }
 } 

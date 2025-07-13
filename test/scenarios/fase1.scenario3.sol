@@ -26,10 +26,11 @@ contract Fase1Cenario3Test is BaseSetup {
         vm.prank(address(this));
         token.setFanifyContract(address(funify));
 
+        uint256 seasonId = oracle.currentSeasonId();
         // Simular criação do jogo no futuro
         uint256 desiredStart = block.timestamp + 3600;
         vm.warp(desiredStart - 100); // 100 segundos antes do início
-        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(seasonId, 0x12345678, "AAA", "BBB", "#aaa_bbb");
 
         // Update hype (70% for Team A, 30% for Team B)
         oracle.updateHype(0x12345678, 7000, 3000);
@@ -55,7 +56,7 @@ contract Fase1Cenario3Test is BaseSetup {
     }
 
     function testAposFechamento() public {
-        (uint256 startTimestamp, uint256 duration) = getTimestamps();
+        (uint256 startTimestamp,) = getTimestamps();
         
         // Avançar para antes do início para apostar
         vm.warp(startTimestamp - 10);

@@ -26,10 +26,11 @@ contract Fase2Cenario1Test is BaseSetup {
         vm.prank(address(this));
         token.setFanifyContract(address(funify));
 
+        uint256 seasonId = oracle.currentSeasonId();
         // Simular criação do jogo no futuro
         uint256 desiredStart = block.timestamp + 3600;
         vm.warp(desiredStart - 100); // 100 segundos antes do início
-        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(seasonId, 0x12345678, "AAA", "BBB", "#aaa_bbb");
 
         // Update hype (70% for Team A, 30% for Team B)
         oracle.updateHype(0x12345678, 7000, 3000);

@@ -9,14 +9,15 @@ abstract contract SeasonfyPlaceBet is SeasonfyStake {
 
     /**
      * @dev Função para fazer aposta (apenas a favor do time do NFT)
+     * @param seasonId ID da temporada
      * @param hypeId ID do jogo
      * @param teamA true para Time A, false para Time B
      * @param amount Quantidade de HYPE para apostar
      */
-    function placeBet(bytes4 hypeId, bool teamA, uint256 amount) 
+    function placeBet(uint256 seasonId, bytes4 hypeId, bool teamA, uint256 amount) 
         external 
-        onlyValidPlaceBet(hypeId, amount)
-        onlyCanBetForTeam(hypeId, teamA)
+        onlyValidPlaceBet(seasonId, hypeId, amount)
+        onlyCanBetForTeam(seasonId, hypeId, teamA)
     {
         // Transferir HYPE do usuário para o contrato
         if (!token.transferFrom(msg.sender, address(this), amount)) {
@@ -24,7 +25,7 @@ abstract contract SeasonfyPlaceBet is SeasonfyStake {
         }
 
         // Registrar aposta
-        bets[hypeId][msg.sender] = Bet({amount: amount, teamA: teamA});
+        bets[hypeId][msg.sender] = Bet({amount: amount, teamA: teamA, seasonId: seasonId});
         if (teamA) {
             prizePoolA[hypeId] += amount;
         } else {

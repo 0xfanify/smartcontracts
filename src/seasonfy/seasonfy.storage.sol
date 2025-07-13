@@ -49,10 +49,12 @@ abstract contract SeasonfyStorage is SeasonfyError, SeasonfyEvents {
      * @dev Estrutura para rastrear apostas dos usuários
      * @param amount Quantidade de HYPE apostada
      * @param teamA true para Time A, false para Time B
+     * @param seasonId ID da temporada da aposta
      */
     struct Bet {
         uint256 amount; // Amount of HYPE bet
         bool teamA; // true for Team A, false for Team B
+        uint256 seasonId; // Season ID of the bet
     }
 
     // Mappings para armazenar dados do sistema

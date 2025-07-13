@@ -17,9 +17,12 @@ abstract contract SeasonfySec is SeasonfyStorage {
         _;
     }
 
-    modifier onlyValidClaim(bytes4 hypeId) {
+    modifier onlyValidClaim(uint256 seasonId, bytes4 hypeId) {
         if (bets[hypeId][msg.sender].amount == 0) {
             revert(NoBetOnMatch);
+        }
+        if (bets[hypeId][msg.sender].seasonId != seasonId) {
+            revert(InvalidSeasonId);
         }
         _;
     }
@@ -51,9 +54,15 @@ abstract contract SeasonfySec is SeasonfyStorage {
         _;
     }
 
-    modifier onlyValidPlaceBet(bytes4 hypeId, uint256 amount) {
+    modifier onlyValidPlaceBet(uint256 seasonId, bytes4 hypeId, uint256 amount) {
         if (oracle.matchExists(hypeId) == false) {
             revert(NoBetOnMatch);
+        }
+        
+        // Verificar se o jogo pertence à temporada correta
+        (,,,,,,,,, uint256 matchSeasonId) = oracle.getMatch(hypeId);
+        if (matchSeasonId != seasonId) {
+            revert(InvalidSeasonId);
         }
         
         OracleCrud.GameStatus status = oracle.getGameStatus(hypeId);
@@ -70,7 +79,7 @@ abstract contract SeasonfySec is SeasonfyStorage {
         _;
     }
 
-    modifier onlyValidStake(address fanToken, uint256 amount) {
+    modifier onlyValidStake(address fanToken, uint256 amount, uint256 seasonId) {
         if (amount == 0) {
             revert(InvalidStakeAmount);
         }
@@ -80,11 +89,14 @@ abstract contract SeasonfySec is SeasonfyStorage {
         if (oracle.getTokenPrice("CHZ") == 0) {
             revert(FanTokenNotSupported);
         }
+        if (!oracle.isSeasonActive(seasonId)) {
+            revert(InvalidSeasonId);
+        }
         _;
     }
 
-    modifier onlySeasonEnded() {
-        if (!oracle.isSeasonEnded()) {
+    modifier onlySeasonEnded(uint256 seasonId) {
+        if (!oracle.isSeasonEnded(seasonId)) {
             revert(SeasonNotEnded);
         }
         _;
@@ -94,21 +106,23 @@ abstract contract SeasonfySec is SeasonfyStorage {
         if (stakes[msg.sender].fanTokenAmount == 0) {
             revert(NoStakeFound);
         }
-        if (!oracle.isSeasonEnded()) {
+        if (!oracle.isSeasonEnded(stakes[msg.sender].seasonId)) {
             revert(SeasonNotEnded);
         }
         _;
     }
 
-    modifier onlyCanBetForTeam(bytes4 hypeId, bool teamA) {
+    modifier onlyCanBetForTeam(uint256 seasonId, bytes4 hypeId, bool teamA) {
         Stake storage stake = stakes[msg.sender];
         if (stake.fanTokenAmount == 0) {
             revert(NoNFTForTeam);
         }
+        if (stake.seasonId != seasonId) {
+            revert(InvalidSeasonId);
+        }
 
         // Verificar se o time do NFT está jogando neste match
-        (uint256 hypeA, uint256 hypeB, , , , , string memory teamAAbbreviation, string memory teamBAbbreviation,) = oracle.getMatch(hypeId);
-        
+        (,,,,,,,,, uint256 matchSeasonId) = oracle.getMatch(hypeId);
         // Aqui você pode implementar a lógica para verificar se o time do NFT está jogando
         // Por enquanto, vamos permitir apostas apenas a favor do time (não contra)
         if (!teamA) {

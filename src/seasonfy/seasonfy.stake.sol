@@ -13,10 +13,11 @@ abstract contract SeasonfyStake is SeasonfyCrud {
      * @param fanToken Endereço do Fan Token
      * @param amount Quantidade de Fan Token para fazer stake
      * @param teamId ID do time para o NFT
+     * @param seasonId ID da temporada
      */
-    function stakeFanToken(address fanToken, uint256 amount, uint256 teamId) 
+    function stakeFanToken(address fanToken, uint256 amount, uint256 teamId, uint256 seasonId) 
         external 
-        onlyValidStake(fanToken, amount) 
+        onlyValidStake(fanToken, amount, seasonId) 
     {
         // Transferir Fan Token do usuário para o MockFanX
         if (!ERC20(fanToken).transferFrom(msg.sender, mockFanX, amount)) {
@@ -34,19 +35,19 @@ abstract contract SeasonfyStake is SeasonfyCrud {
         token.mintBySeasonfy(msg.sender, hypeAmount);
         
         // Mintar NFT do time
-        uint256 nftTokenId = teamNFT.mintTo(msg.sender, teamId, 1); // seasonId = 1 para primeira temporada
+        uint256 nftTokenId = teamNFT.mintTo(msg.sender, teamId, seasonId);
         
         // Registrar stake
         stakes[msg.sender] = Stake({
             fanTokenAmount: amount,
             hypeAmount: hypeAmount,
             teamId: teamId,
-            seasonId: 1, // Primeira temporada
+            seasonId: seasonId,
             nftTokenId: nftTokenId,
             stakedAt: block.timestamp
         });
 
-        emit FanTokenStaked(msg.sender, fanToken, amount, hypeAmount, teamId, 1, nftTokenId);
+        emit FanTokenStaked(msg.sender, fanToken, amount, hypeAmount, teamId, seasonId, nftTokenId);
     }
 
     /**
@@ -69,17 +70,5 @@ abstract contract SeasonfyStake is SeasonfyCrud {
         delete stakes[msg.sender];
         
         emit FanTokenUnstaked(msg.sender, address(0), fanTokenAmount, nftTokenId);
-    }
-
-    /**
-     * @dev Função para atualizar o fim da temporada (apenas owner)
-     * @param newEndTimestamp Novo timestamp do fim da temporada
-     */
-    function updateSeasonEndTimestamp(uint256 newEndTimestamp) external onlyOwner {
-        if (newEndTimestamp <= block.timestamp) {
-            revert(InvalidStakeAmount);
-        }
-        oracle.updateSeasonEndTimestamp(newEndTimestamp);
-        emit SeasonEndTimestampUpdated(newEndTimestamp);
     }
 } 

@@ -35,11 +35,15 @@ contract TimeValidationTest is Test, FunifyError {
     }
     
     function test_PlaceBetBeforeMatchStart() public {
-        // Agendar jogo para 1 hora no futuro
-        uint256 startTimestamp = block.timestamp + 3600;
-        uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        uint256 seasonId = oracle.currentSeasonId();
+        
+        // Avançar o tempo para garantir que estamos no futuro
+        vm.warp(block.timestamp + 100);
+        
+        // Agendar jogo
+        oracle.scheduleMatch(seasonId, 0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
+        
         // Para os testes de aposta, não iniciar o jogo ainda
         
         // Aposta deve funcionar antes do início do jogo
@@ -53,12 +57,16 @@ contract TimeValidationTest is Test, FunifyError {
     }
     
     function test_PlaceBetAfterMatchStart() public {
-        // Agendar jogo para 1 hora no futuro
-        uint256 startTimestamp = block.timestamp + 3600;
-        uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        uint256 seasonId = oracle.currentSeasonId();
+        
+        // Avançar o tempo para garantir que estamos no futuro
+        vm.warp(block.timestamp + 100);
+        
+        // Agendar jogo
+        oracle.scheduleMatch(seasonId, 0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
-        // Para os testes de aposta, não iniciar o jogo ainda
+        
+        uint256 startTimestamp = oracle.getStartTimestamp(0x12345678);
         
         // Avançar o tempo para depois do início do jogo
         vm.warp(startTimestamp + 1);
@@ -70,12 +78,16 @@ contract TimeValidationTest is Test, FunifyError {
     }
     
     function test_PlaceBetExactlyAtMatchStart() public {
-        // Agendar jogo para 1 hora no futuro
-        uint256 startTimestamp = block.timestamp + 3600;
-        uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        uint256 seasonId = oracle.currentSeasonId();
+        
+        // Avançar o tempo para garantir que estamos no futuro
+        vm.warp(block.timestamp + 100);
+        
+        // Agendar jogo
+        oracle.scheduleMatch(seasonId, 0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
-        // Para os testes de aposta, não iniciar o jogo ainda
+        
+        uint256 startTimestamp = oracle.getStartTimestamp(0x12345678);
         
         // Avançar o tempo para exatamente o início do jogo
         vm.warp(startTimestamp);
@@ -87,12 +99,16 @@ contract TimeValidationTest is Test, FunifyError {
     }
     
     function test_PlaceBetOneSecondBeforeMatchStart() public {
-        // Agendar jogo para 1 hora no futuro
-        uint256 startTimestamp = block.timestamp + 3600;
-        uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        uint256 seasonId = oracle.currentSeasonId();
+        
+        // Avançar o tempo para garantir que estamos no futuro
+        vm.warp(block.timestamp + 100);
+        
+        // Agendar jogo
+        oracle.scheduleMatch(seasonId, 0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
-        // Para os testes de aposta, não iniciar o jogo ainda
+        
+        uint256 startTimestamp = oracle.getStartTimestamp(0x12345678);
         
         // Avançar o tempo para 1 segundo antes do início do jogo
         vm.warp(startTimestamp - 1);

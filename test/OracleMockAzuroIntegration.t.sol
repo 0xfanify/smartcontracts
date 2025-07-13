@@ -19,7 +19,7 @@ contract OracleMockAzuroIntegrationTest is Test, FunifyError {
         oracle = new Oracle(address(mockAzuro));
     }
     
-    function test_OracleConstructor() public {
+    function test_OracleConstructor() public view {
         assertEq(oracle.owner(), owner);
         assertEq(address(oracle.mockAzuro()), address(mockAzuro));
     }

@@ -6,6 +6,7 @@ import "solady/tokens/ERC20.sol";
 contract HypeToken is ERC20 {
     address public owner;
     bool private _locked;
+    address public funifyContract;
 
     // Events
     event TokensStaked(address indexed user, uint256 ethAmount, uint256 tokensMinted);
@@ -30,6 +31,10 @@ contract HypeToken is ERC20 {
         // _mint(msg.sender, 1_000_000e18);
     }
 
+    function setFunifyContract(address _funifyContract) external onlyOwner {
+        funifyContract = _funifyContract;
+    }
+
     function name() public pure override returns (string memory) {
         return "Hype Token";
     }
@@ -42,21 +47,25 @@ contract HypeToken is ERC20 {
         return 18;
     }
 
-    // Override transfer functions to make token non-transferable
-    function transfer(address, /* to */ uint256 /* amount */ ) public pure override returns (bool) {
+    // Override transfer functions to make token non-transferable except for Funify contract
+    function transfer(address to, uint256 amount) public override returns (bool) {
+        if (msg.sender == funifyContract || to == funifyContract) {
+            return super.transfer(to, amount);
+        }
         revert("HYPE tokens are non-transferable");
     }
 
-    function transferFrom(address, /* from */ address, /* to */ uint256 /* amount */ )
-        public
-        pure
-        override
-        returns (bool)
-    {
+    function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
+        if (msg.sender == funifyContract || from == funifyContract || to == funifyContract) {
+            return super.transferFrom(from, to, amount);
+        }
         revert("HYPE tokens are non-transferable");
     }
 
-    function approve(address, /* spender */ uint256 /* amount */ ) public pure override returns (bool) {
+    function approve(address spender, uint256 amount) public override returns (bool) {
+        if (spender == funifyContract) {
+            return super.approve(spender, amount);
+        }
         revert("HYPE tokens are non-transferable");
     }
 

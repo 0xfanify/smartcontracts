@@ -19,6 +19,10 @@ contract Fase2Cenario1Test is BaseSetup {
         oracle = new Oracle();
         vm.prank(casa);
         funify = new Funify(address(token), address(oracle));
+        
+        // Set Funify contract in HypeToken to allow transfers
+        vm.prank(address(this));
+        token.setFunifyContract(address(funify));
 
         // Schedule match for future time
         uint256 scheduledTime = block.timestamp + 1 hours;

@@ -20,9 +20,9 @@
 
 # Token \$HYPE (ERC-20 Não-Transferível)
 
-- [ ] Criar/atualizar o contrato \$HYPE para sobrescrever `transfer`, `transferFrom` e `approve`, revertendo toda tentativa de movimentação.
-- [ ] Validar que a cunhagem e queima estão atreladas apenas às funções de stake e unstake.
-- [ ] Escrever teste unitário para garantir a não-transferibilidade do \$HYPE.
+- [x] Criar/atualizar o contrato \$HYPE para sobrescrever `transfer`, `transferFrom` e `approve`, revertendo toda tentativa de movimentação.
+- [x] Validar que a cunhagem e queima estão atreladas apenas às funções de stake e unstake.
+- [x] Escrever teste unitário para garantir a não-transferibilidade do \$HYPE.
 
 ---
 

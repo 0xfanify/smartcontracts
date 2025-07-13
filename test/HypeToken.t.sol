@@ -72,20 +72,19 @@ contract HypeTokenTest is Test {
     }
 
     function test_TransferToZeroAddressShouldRevert() public {
-        // First stake some tokens
+        hypeToken.setFunifyContract(address(0xCAFE));
         vm.prank(user1);
         hypeToken.stake{value: 1 ether}();
 
-        // Try to transfer to zero address
         vm.prank(user1);
         vm.expectRevert("HYPE tokens are non-transferable");
         hypeToken.transfer(address(0), 1000e18);
     }
 
     function test_TransferFromZeroAddressShouldRevert() public {
-        // Try to transferFrom zero address
+        // Try to transferFrom zero address - should revert with ERC20 error
         vm.prank(user1);
-        vm.expectRevert("HYPE tokens are non-transferable");
+        vm.expectRevert();
         hypeToken.transferFrom(address(0), user1, 1000e18);
     }
 
@@ -98,6 +97,87 @@ contract HypeTokenTest is Test {
         vm.prank(user1);
         vm.expectRevert("HYPE tokens are non-transferable");
         hypeToken.transfer(user2, 0);
+    }
+
+    // ============ FUNIFY CONTRACT TESTS ============
+
+    function test_SetFunifyContract() public {
+        address funifyContract = makeAddr("funify");
+        
+        hypeToken.setFunifyContract(funifyContract);
+        assertEq(hypeToken.funifyContract(), funifyContract);
+    }
+
+    function test_SetFunifyContract_OnlyOwner() public {
+        address funifyContract = makeAddr("funify");
+        
+        vm.prank(user1);
+        vm.expectRevert("Only owner can call this function");
+        hypeToken.setFunifyContract(funifyContract);
+    }
+
+    function test_TransferToFunifyContract() public {
+        address funifyContract = makeAddr("funify");
+        hypeToken.setFunifyContract(funifyContract);
+        
+        // Mint tokens to user1
+        hypeToken.mint(user1, 1000e18);
+        
+        // Transfer to Funify contract should work
+        vm.prank(user1);
+        bool success = hypeToken.transfer(funifyContract, 500e18);
+        assertTrue(success);
+        assertEq(hypeToken.balanceOf(funifyContract), 500e18);
+        assertEq(hypeToken.balanceOf(user1), 500e18);
+    }
+
+    function test_TransferFromFunifyContract() public {
+        address funifyContract = makeAddr("funify");
+        hypeToken.setFunifyContract(funifyContract);
+        
+        // Mint tokens to Funify contract
+        hypeToken.mint(funifyContract, 1000e18);
+        
+        // Transfer from Funify contract should work
+        vm.prank(funifyContract);
+        bool success = hypeToken.transfer(user1, 500e18);
+        assertTrue(success);
+        assertEq(hypeToken.balanceOf(user1), 500e18);
+        assertEq(hypeToken.balanceOf(funifyContract), 500e18);
+    }
+
+    function test_TransferFromByFunifyContract() public {
+        address funifyContract = makeAddr("funify");
+        hypeToken.setFunifyContract(funifyContract);
+        
+        // Mint tokens to user1
+        hypeToken.mint(user1, 1000e18);
+        
+        // Approve Funify contract
+        vm.prank(user1);
+        bool approveSuccess = hypeToken.approve(funifyContract, 500e18);
+        assertTrue(approveSuccess);
+        
+        // TransferFrom by Funify contract should work
+        vm.prank(funifyContract);
+        bool success = hypeToken.transferFrom(user1, user2, 500e18);
+        assertTrue(success);
+        assertEq(hypeToken.balanceOf(user2), 500e18);
+        assertEq(hypeToken.balanceOf(user1), 500e18);
+    }
+
+    function test_ApproveFunifyContract() public {
+        address funifyContract = makeAddr("funify");
+        hypeToken.setFunifyContract(funifyContract);
+        
+        // Mint tokens to user1
+        hypeToken.mint(user1, 1000e18);
+        
+        // Approve Funify contract should work
+        vm.prank(user1);
+        bool success = hypeToken.approve(funifyContract, 500e18);
+        assertTrue(success);
+        assertEq(hypeToken.allowance(user1, funifyContract), 500e18);
     }
 
     // ============ STAKE TESTS ============

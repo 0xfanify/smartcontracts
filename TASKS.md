@@ -1,79 +1,92 @@
 # Oracles Integration
 
-* [ ] Criar estrutura inicial do contrato `PriceOracle.sol` com suporte a `getLatestPrice()` usando interface da Pyth.
-* [ ] Mapear os feeds de Fan Tokens e USD disponíveis na Pyth Network.
-* [ ] Esboçar contrato `ScoreOracle.sol` com stub de função `getLatestScore(teamA, teamB)`.
-* [ ] Documentar possíveis fontes de dados para placares em Chainlink (Keepers, Functions).
-* [ ] Criar estrutura base do contrato `HypeOracle.sol` com função `submitHypeScore(teamId, score)`.
+- [ ] Criar estrutura inicial do contrato `PriceOracle.sol` com suporte a `getLatestPrice()` usando interface da Pyth.
+- [ ] Mapear os feeds de Fan Tokens e USD disponíveis na Pyth Network.
+- [ ] Esboçar contrato `ScoreOracle.sol` com stub de função `getLatestScore(teamA, teamB)`.
+- [ ] Documentar fontes de dados esportivos possíveis via Chainlink Functions.
+- [ ] Criar estrutura base do contrato `HypeOracle.sol` com função `submitHypeScore(teamId, score)`.
 
 ---
 
-# Team NFT (ERC-721)
+# Team NFT (ERC-721 Não-Transferível)
 
-* [ ] Criar contrato básico ERC-721 usando OpenZeppelin para `TeamNFT.sol`.
-* [ ] Adicionar suporte a metadados `teamId` e `seasonId` no NFT.
-* [ ] Implementar função `mintTo(address, teamId, seasonId)` no contrato `TeamNFT`.
-* [ ] Escrever teste unitário simples para verificação de `balanceOf()` e `tokenURI()`.
+- [ ] Criar contrato `TeamNFT.sol` como ERC-721 com função `mintTo(address, teamId, seasonId)`.
+- [ ] Tornar o NFT **non-transferable** sobrescrevendo `transferFrom` e `approve` para revert.
+- [ ] Adicionar metadados `teamId` e `seasonId` no token URI.
+- [ ] Implementar função `burn(uint256 tokenId)` acessível apenas pelo contrato de stake.
+- [ ] Escrever teste unitário para garantir que `transfer` e `approve` revertam.
 
 ---
 
-# Token $HYPE
+# Token \$HYPE (ERC-20 Não-Transferível)
 
-* [ ] Auditar função de `mint` e `burn` no contrato atual do $HYPE.
-* [ ] Implementar função `mintWithOraclePrice(address user, uint256 chzAmount)` no contrato.
-* [ ] Escrever teste unitário para validar mint baseado em preços da Pyth Network.
+- [ ] Criar/atualizar o contrato \$HYPE para sobrescrever `transfer`, `transferFrom` e `approve`, revertendo toda tentativa de movimentação.
+- [ ] Validar que a cunhagem e queima estão atreladas apenas às funções de stake e unstake.
+- [ ] Escrever teste unitário para garantir a não-transferibilidade do \$HYPE.
 
 ---
 
 # Stake CHZ e Fan Tokens
 
-* [ ] Atualizar contrato `CHZStake.sol` para verificar `approve()` corretamente no `unstake()`.
-* [ ] Criar função `stakeFanToken()` que emite NFT após stake bem-sucedido.
-* [ ] Esboçar lógica para restringir apostas com base na posse de NFT (`onlyWithTeamNFT()` modifier).
-* [ ] Adicionar testes básicos de fluxo: `stake → mint NFT → try bet`.
+- [ ] Atualizar `CHZStake.sol` para garantir `approve()` no `unstake()` via `IERC20.transferFrom`.
+- [ ] Criar `FanTokenStake.sol` com função `stake()` que:
+
+  - [ ] Valida o stake.
+  - [ ] Emite NFT de Time.
+  - [ ] Cunha \$HYPE com bônus.
+
+- [ ] Implementar `unstake()` que:
+
+  - [ ] Requer que temporada tenha terminado.
+  - [ ] Queima o NFT de Time (`TeamNFT.burn()`).
+  - [ ] Retorna os Fan Tokens ao usuário.
+
+- [ ] Escrever modifier `onlyWithValidNFT(teamId)` para uso no contrato de apostas.
 
 ---
 
 # Claim Bug Fix
 
-* [ ] Criar teste unitário para validar `claim()` com aposta vencedora.
-* [ ] Escrever verificação explícita de elegibilidade no `claim()` (ex: partida finalizada).
-* [ ] Adicionar `nonReentrant` na função `claim()` para prevenir ataques.
-* [ ] Medir consumo de gás da função `claim()` com Hardhat.
+- [ ] Criar teste unitário para validar `claim()` com aposta válida e NFT correspondente.
+- [ ] Garantir verificação se o jogo acabou e o usuário é vencedor antes do `claim()`.
+- [ ] Proteger a função com `nonReentrant` e limitar repetições.
+- [ ] Verificar consumo de gás com e sem NFTs no `claim()`.
 
 ---
 
 # Backend (Oracles & Hype)
 
-* [ ] Criar função `fetchFanTokenPrices()` no backend usando endpoint da Pyth.
-* [ ] Escrever serviço `submitHypeToChain()` para enviar score ao contrato via carteira.
-* [ ] Criar cron job `checkMatchResults()` simulando Chainlink Keepers.
-* [ ] Testar endpoint de consulta ao Hype Score com cache e normalização aplicada.
+- [ ] Criar serviço `getLatestPrices()` usando Pyth e expor em `/api/prices`.
+- [ ] Criar endpoint para submeter Hype Score via carteira assinando transação (`submitHypeScore(teamId, score)`).
+- [ ] Implementar job de simulação de Chainlink Keeper para atualização de placar.
+- [ ] Aplicar normalização de dados de redes sociais e armazenar Hype Score off-chain antes de enviar.
 
 ---
 
 # Frontend
 
-* [ ] Adicionar componente de visualização do NFT de time na UI do usuário.
-* [ ] Criar botão de "Apostar com NFT" que verifica o saldo de `TeamNFT`.
-* [ ] Implementar exibição do preço do Fan Token via chamada ao contrato `PriceOracle`.
-* [ ] Adicionar tela de feedback para `claim()` com status e mensagens de erro.
+- [ ] Criar componente que exibe o NFT de Time com season e time atual.
+- [ ] Adicionar botão de "Desfazer Stake" que queima o NFT e retorna Fan Token.
+- [ ] Atualizar exibição de saldo de \$HYPE com tooltip explicando que ele é intransferível.
+- [ ] Mostrar alerta amigável quando usuário tenta transferir NFT ou \$HYPE.
 
 ---
 
 # Testes & Auditoria
 
-* [ ] Escrever 1 teste unitário por contrato novo: `PriceOracle`, `ScoreOracle`, `HypeOracle`, `TeamNFT`.
-* [ ] Rodar testes de integração locais entre stake, NFT e aposta.
-* [ ] Escrever checklist pré-auditoria com funções críticas por contrato.
-* [ ] Criar relatório de cobertura de testes com Hardhat ou Foundry.
+- [ ] Escrever teste unitário para `TeamNFT.sol`, testando `mint`, `burn` e bloqueio de `transfer`.
+- [ ] Escrever teste unitário para `HYPE.sol`, testando bloqueio de transferências.
+- [ ] Escrever teste de integração completo para `stake → mint NFT → aposta → claim → unstake → burn`.
+- [ ] Atualizar plano de auditoria com foco em:
+
+  - [ ] Verificação de ownership no NFT.
+  - [ ] Restrições de transferência.
+  - [ ] Lógica de queima do NFT e segurança do claim.
 
 ---
 
 # Implantação
 
-* [ ] Escrever script de deploy para `TeamNFT.sol` na testnet.
-* [ ] Rodar deploy e salvar endereços em `.env` do backend e frontend.
-* [ ] Testar stake e emissão de NFT na testnet simulando interação real.
-* [ ] Validar integração frontend ↔ contratos na testnet com usuário teste.
-
+- [ ] Implementar script de deploy com parâmetros para `TeamNFT`, `HYPE`, `Stake`.
+- [ ] Testar todo fluxo em testnet: stake → NFT → aposta → claim → unstake (NFT queimado).
+- [ ] Verificar se NFT realmente é removido do `ownerOf` após `burn`.

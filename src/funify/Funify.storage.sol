@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Oracle} from "../oracle/Oracle.sol";
-import {HypeToken} from "../HypeToken.sol";
+import {HypeToken} from "../token/HypeToken.sol";
 import {FunifyError} from "./funify.error.sol";
 import {FunifyEvents} from "./funify.events.sol";
 

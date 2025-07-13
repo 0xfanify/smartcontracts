@@ -42,6 +42,24 @@ contract HypeToken is ERC20 {
         return 18;
     }
 
+    // Override transfer functions to make token non-transferable
+    function transfer(address, /* to */ uint256 /* amount */ ) public pure override returns (bool) {
+        revert("HYPE tokens are non-transferable");
+    }
+
+    function transferFrom(address, /* from */ address, /* to */ uint256 /* amount */ )
+        public
+        pure
+        override
+        returns (bool)
+    {
+        revert("HYPE tokens are non-transferable");
+    }
+
+    function approve(address, /* spender */ uint256 /* amount */ ) public pure override returns (bool) {
+        revert("HYPE tokens are non-transferable");
+    }
+
     function stake() public payable nonReentrant {
         if (msg.value < 1 ether) {
             revert("Not enough ETH");

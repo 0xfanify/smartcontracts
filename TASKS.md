@@ -10,11 +10,11 @@
 
 # Team NFT (ERC-721 Não-Transferível)
 
-- [ ] Criar contrato `TeamNFT.sol` como ERC-721 com função `mintTo(address, teamId, seasonId)`.
-- [ ] Tornar o NFT **non-transferable** sobrescrevendo `transferFrom` e `approve` para revert.
-- [ ] Adicionar metadados `teamId` e `seasonId` no token URI.
-- [ ] Implementar função `burn(uint256 tokenId)` acessível apenas pelo contrato de stake.
-- [ ] Escrever teste unitário para garantir que `transfer` e `approve` revertam.
+- [x] Criar contrato `TeamNFT.sol` como ERC-721 com função `mintTo(address, teamId, seasonId)`.
+- [x] Tornar o NFT **non-transferable** sobrescrevendo `transferFrom` e `approve` para revert.
+- [x] Adicionar metadados `teamId` e `seasonId` no token URI.
+- [x] Implementar função `burn(uint256 tokenId)` acessível apenas pelo contrato de stake.
+- [x] Escrever teste unitário para garantir que `transfer` e `approve` revertam.
 
 ---
 

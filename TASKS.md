@@ -1,56 +1,45 @@
-# Oracles Integration
+# Oracle & Fanify & Seasonfy
 
-- [ ] Criar estrutura inicial do contrato `PriceOracle.sol` com suporte a `getLatestPrice()` usando interface da Pyth.
-- [ ] Mapear os feeds de Fan Tokens e USD disponíveis na Pyth Network.
-- [ ] Esboçar contrato `ScoreOracle.sol` com stub de função `getLatestScore(teamA, teamB)`.
-- [ ] Documentar fontes de dados esportivos possíveis via Chainlink Functions.
-- [ ] Criar estrutura base do contrato `HypeOracle.sol` com função `submitHypeScore(teamId, score)`.
+- [ ] apenas admin pode criar um jogo
+- [ ] o oracle deve buscar o preco no contrato `MockAzuro.sol` (o qual tem o mesmo é admin que o Oracle)
+- [ ] quando criar o jogo ele passa a data do inicio do jogo
+- [ ] os contratos de aposta devem consultar a data de inicio do jogo
+- [ ] é possivel apostar apenas até o inicio do jogo
+- [ ] quando o jogo inicia ele deve bloquear apostas
+- [ ] 2h apos o jogo é liberado o premio
 
----
 
-# Stake CHZ e Fan Tokens
+# Stake CHZ (Fanify)
 
-- [ ] Atualizar `CHZStake.sol` para garantir `approve()` no `unstake()` via `IERC20.transferFrom`.
-- [ ] Criar `FanTokenStake.sol` com função `stake()` que:
+- [ ] usuario faz stake de CHZ
+- [ ] contrato busca o preço de CHZ/USD no oracle `getPrice("CHZ")`
+- [ ] trava o CHZ
+- [ ] emite $HYPE na proporção de 1000 HYPE pra 1 USD
+- [ ] usuario pode apostar em qualquer time, a favor ou contra
+- [ ] Usuário pode fazer unstake a qualquer momento
 
-  - [ ] Valida o stake.
-  - [ ] Emite NFT de Time.
-  - [ ] Cunha \$HYPE com bônus.
+# Stake Fan Tokens (Seasonfy)
 
-- [ ] Implementar `unstake()` que:
-
-  - [ ] Requer que temporada tenha terminado.
-  - [ ] Queima o NFT de Time (`TeamNFT.burn()`).
-  - [ ] Retorna os Fan Tokens ao usuário.
-
-- [ ] Escrever modifier `onlyWithValidNFT(teamId)` para uso no contrato de apostas.
+- [ ] usuario faz stake do Fantoken
+- [ ] a lista de fantokens aceitos está o oraculo
+- [ ] contrato busca o preço do  fantoken/USD no oracle `getPrice("CHZ")`
+- [ ] transfere o Fantoken para o contrato chamado `MockFanX.sol` (o qual tem o mesmo admin que o Seasonfy)
+- [ ] emite $HYPE na proporção de 1000 HYPE pra 1 USD
+- [ ] emite um NFT do time para a carteira do usuario
+- [ ] esse lock é até o fim da temporada
+- [ ] o fim da temporada está no contrato
+- [ ] o usuario só pode aposta a favor do time, e só nos jogo que o time dele está jogando (trava feita pelo NFT)
+- [ ] o usuário pode apostar ou nao, mas nao pode apostar contra o time dele
+- [ ] no fim da tempoda o Usuário pode fazer unstake a qualquer momento.
 
 ---
 
 # Claim Bug Fix
 
-- [ ] Criar teste unitário para validar `claim()` com aposta válida e NFT correspondente.
-- [ ] Garantir verificação se o jogo acabou e o usuário é vencedor antes do `claim()`.
-- [ ] Proteger a função com `nonReentrant` e limitar repetições.
-- [ ] Verificar consumo de gás com e sem NFTs no `claim()`.
-
----
-
-# Backend (Oracles & Hype)
-
-- [ ] Criar serviço `getLatestPrices()` usando Pyth e expor em `/api/prices`.
-- [ ] Criar endpoint para submeter Hype Score via carteira assinando transação (`submitHypeScore(teamId, score)`).
-- [ ] Implementar job de simulação de Chainlink Keeper para atualização de placar.
-- [ ] Aplicar normalização de dados de redes sociais e armazenar Hype Score off-chain antes de enviar.
-
----
-
-# Frontend
-
-- [ ] Criar componente que exibe o NFT de Time com season e time atual.
-- [ ] Adicionar botão de "Desfazer Stake" que queima o NFT e retorna Fan Token.
-- [ ] Atualizar exibição de saldo de \$HYPE com tooltip explicando que ele é intransferível.
-- [ ] Mostrar alerta amigável quando usuário tenta transferir NFT ou \$HYPE.
+- [x] Criar teste unitário para validar `claim()` com aposta válida e NFT correspondente.
+- [x] Garantir verificação se o jogo acabou e o usuário é vencedor antes do `claim()`.
+- [x] Proteger a função com `nonReentrant` e limitar repetições.
+- [x] Verificar consumo de gás com e sem NFTs no `claim()`.
 
 ---
 

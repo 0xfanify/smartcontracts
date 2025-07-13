@@ -17,9 +17,9 @@
 
 ---
 
-# Token \$HYPE
+# Token $HYPE
 
-* [ ] Auditar função de `mint` e `burn` no contrato atual do \$HYPE.
+* [ ] Auditar função de `mint` e `burn` no contrato atual do $HYPE.
 * [ ] Implementar função `mintWithOraclePrice(address user, uint256 chzAmount)` no contrato.
 * [ ] Escrever teste unitário para validar mint baseado em preços da Pyth Network.
 

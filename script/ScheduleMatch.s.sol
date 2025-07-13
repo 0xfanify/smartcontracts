@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-import {Oracle} from "../src/Oracle.sol";
+import {Oracle} from "../src/oracle/Oracle.sol";
 
 contract ScheduleMatchScript is Script {
     function setUp() public {}

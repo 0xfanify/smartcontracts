@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {FunifyStorage} from "./funify.storage.sol";
-import {Status} from "../Oracle.sol";
+import {Status} from "../oracle/Oracle.sol";
 
 abstract contract FunifySec is FunifyStorage {
     constructor(address _token, address _oracle) FunifyStorage(_token, _oracle) {}

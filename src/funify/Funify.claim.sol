@@ -39,15 +39,19 @@ abstract contract FunifyClaim is FunifyCrud {
         (,, uint8 goalsA, uint8 goalsB,,,,,,,) = oracle.getMatch(hypeId);
         bool teamAWon = goalsA > goalsB;
 
-        // Calcule oddsA e oddsB
+        // Calculate odds
         uint256 oddsA = _getOdds(hypeA, hypeB, true);
         uint256 oddsB = _getOdds(hypeA, hypeB, false);
         uint256 userOdds = bet.teamA ? oddsA : oddsB;
+        
+        // Calculate pools
         uint256 totalPool = prizePoolA[hypeId] + prizePoolB[hypeId];
         uint256 houseCut = (totalPool * HOUSE_FEE) / 1e18;
         uint256 prizePool = totalPool - houseCut;
 
+        // Calculate total proportion
         uint256 totalProporcao = _getTotalProporcao(teamAWon, prizePoolA[hypeId], prizePoolB[hypeId], oddsA, oddsB);
+        
         return (bet.amount * userOdds * prizePool) / totalProporcao;
     }
 

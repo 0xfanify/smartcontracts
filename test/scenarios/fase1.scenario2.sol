@@ -2,8 +2,8 @@
 pragma solidity ^0.8.20;
 
 import "../../src/HypeToken.sol";
-import "../../src/Oracle.sol";
-import "../../src/funify/funify.sol";
+import "../../src/oracle/Oracle.sol";
+import "../../src/funify/Funify.sol";
 import "../BaseSetup.t.sol";
 
 contract Fase1Cenario2Test is BaseSetup {

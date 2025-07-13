@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {FunifySec} from "./funify.sec.sol";
-import {Status} from "../Oracle.sol";
+import {Status} from "../oracle/Oracle.sol";
 
 abstract contract FunifyCrud is FunifySec {
     constructor(address _token, address _oracle) FunifySec(_token, _oracle) {}

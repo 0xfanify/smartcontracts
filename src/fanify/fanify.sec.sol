@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {FunifyStorage} from "./fanify.storage.sol";
-import {Status} from "../oracle/Oracle.sol";
+import {OracleStorage} from "../oracle/oracle.storage.sol";
 
 abstract contract FunifySec is FunifyStorage {
     constructor(address _token, address _oracle) FunifyStorage(_token, _oracle) {}
@@ -22,8 +22,10 @@ abstract contract FunifySec is FunifyStorage {
     }
 
     modifier onlyMatchFinished(bytes4 hypeId) {
-        Status status = oracle.getMatchStatus(hypeId);
-        if (status != Status.Finished) {
+        (
+            , , , , uint256 startTimestamp, uint256 duration, , ,
+        ) = oracle.getMatch(hypeId);
+        if (block.timestamp < startTimestamp + duration) {
             revert(MatchNotFinished);
         }
         _;
@@ -50,8 +52,10 @@ abstract contract FunifySec is FunifyStorage {
         if (oracle.matchExists(hypeId) == false) {
             revert(NoBetOnMatch);
         }
-        Status status = oracle.getMatchStatus(hypeId);
-        if (status != Status.Open) {
+        (
+            , , , , uint256 startTimestamp, , , ,
+        ) = oracle.getMatch(hypeId);
+        if (block.timestamp >= startTimestamp) {
             revert(MatchNotOpen);
         }
         if (amount == 0) {

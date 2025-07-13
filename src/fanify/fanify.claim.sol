@@ -13,16 +13,23 @@ abstract contract FunifyClaim is FunifyCrud {
         onlyUserWon(hypeId)
         onlyValidClaim(hypeId)
     {
+        uint256 userPrize = _processClaim(hypeId);
+        _transferPrize(msg.sender, userPrize);
+        emit PrizesDistributed(hypeId, msg.sender, userPrize);
+    }
+
+    function _processClaim(bytes4 hypeId) internal returns (uint256) {
         Bet storage bet = bets[hypeId][msg.sender];
         uint256 userPrize = _calculatePrize(hypeId, bet);
         _updateHouseProfit(hypeId);
         bet.amount = 0;
+        return userPrize;
+    }
 
-        if (!token.transfer(msg.sender, userPrize)) {
+    function _transferPrize(address recipient, uint256 amount) internal {
+        if (!token.transfer(recipient, amount)) {
             revert(TokenTransferFailed);
         }
-
-        emit PrizesDistributed(hypeId, msg.sender, userPrize);
     }
 
     function _calculatePrize(bytes4 hypeId, Bet storage bet) internal view returns (uint256) {
@@ -36,8 +43,7 @@ abstract contract FunifyClaim is FunifyCrud {
     }
 
     function _getMatchOdds(bytes4 hypeId) internal view returns (bool teamAWon, uint256 oddsA, uint256 oddsB) {
-        (uint256 hypeA, uint256 hypeB,) = oracle.getHype(hypeId);
-        (,, uint8 goalsA, uint8 goalsB,,,,,,,) = oracle.getMatch(hypeId);
+        (uint256 hypeA, uint256 hypeB, uint8 goalsA, uint8 goalsB, , , , ,) = oracle.getMatch(hypeId);
         teamAWon = goalsA > goalsB;
         oddsA = _getOdds(hypeA, hypeB, true);
         oddsB = _getOdds(hypeA, hypeB, false);

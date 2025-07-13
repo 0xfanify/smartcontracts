@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "../../src/tokens/HypeToken.sol";
 import "../../src/oracle/Oracle.sol";
+import "../../src/oracle/MockAzuro.sol";
 import "../../src/fanify/Funify.sol";
 import "../BaseSetup.t.sol";
 
@@ -16,7 +17,8 @@ contract Fase1Cenario4Test is BaseSetup {
     function setUp() public override {
         super.setUp();
         token = new HypeToken();
-        oracle = new Oracle();
+        MockAzuro mockAzuro = new MockAzuro();
+        oracle = new Oracle(address(mockAzuro));
         vm.prank(casa);
         funify = new Funify(address(token), address(oracle));
 
@@ -25,37 +27,49 @@ contract Fase1Cenario4Test is BaseSetup {
         token.setFanifyContract(address(funify));
 
         // Schedule match for future time
-        uint256 scheduledTime = block.timestamp + 1 hours;
-        oracle.scheduleMatch(0x12345678, scheduledTime, "AAA", "BBB", "#aaa_bbb");
+        uint256 startTimestamp = block.timestamp + 3600;
+        uint256 duration = 7200;
+        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
 
         // Update hype (70% for Team A, 30% for Team B)
         oracle.updateHype(0x12345678, 7000, 3000);
 
-        // Open match for betting
-        oracle.openToBets(0x12345678);
+        // Salvar timestamps para uso no teste
+        vm.store(address(this), bytes32(uint256(0)), bytes32(startTimestamp));
+        vm.store(address(this), bytes32(uint256(1)), bytes32(duration));
 
-        apostadores = createUsers(15);
-        for (uint256 i = 0; i < 15; i++) {
+        apostadores = createUsers(10);
+        for (uint256 i = 0; i < 10; i++) {
             token.mint(apostadores[i], 10000 ether);
             vm.prank(apostadores[i]);
             token.approve(address(funify), type(uint256).max);
         }
     }
 
+    function getTimestamps() internal view returns (uint256 startTimestamp, uint256 duration) {
+        startTimestamp = uint256(vm.load(address(this), bytes32(uint256(0))));
+        duration = uint256(vm.load(address(this), bytes32(uint256(1))));
+    }
+
     function testReivindicarAntesFim() public {
-        // User places bet on Team A
-        vm.prank(apostadores[0]);
-        funify.placeBet(0x12345678, true, 100 ether);
+        (uint256 startTimestamp, uint256 duration) = getTimestamps();
+        
+        // Avançar para antes do início para apostar
+        vm.warp(startTimestamp - 10);
+        
+        // Place bets
+        for (uint256 i = 0; i < 10; i++) {
+            vm.prank(apostadores[i]);
+            funify.placeBet(0x12345678, true, 100 ether);
+        }
 
-        // Close bets and start match
-        oracle.closeBets(0x12345678);
-
-        // Update score: Team A wins (1-0)
+        // Avançar para o início do jogo para updateScore
+        vm.warp(startTimestamp + 1);
         oracle.updateScore(0x12345678, 1, 0);
 
-        // Try to claim prize before match is finished - should revert
-        vm.expectRevert(bytes("E005"));
+        // Tentar claim antes do fim do jogo - deve falhar
         vm.prank(apostadores[0]);
+        vm.expectRevert(bytes("E005")); // MatchNotFinished
         funify.claimPrize(0x12345678);
     }
 }

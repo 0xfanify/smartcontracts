@@ -22,16 +22,16 @@ contract ScheduleMatchScript is Script {
         // Schedule test match
         console.log("[3] Scheduling test match...");
         bytes4 testHypeId = 0x12341234;
-        uint256 scheduledTime = block.timestamp + 3600;
+        uint256 startTimestamp = block.timestamp + 3600; // 1 hora no futuro
+        uint256 duration = 7200; // 2 horas de duração
 
-        oracle.scheduleMatch(testHypeId, scheduledTime, "PSG", "MIA", "#Chiliz_PSGxMIA_20250629");
+        oracle.scheduleMatch(testHypeId, startTimestamp, duration, "PSG", "MIA", "#Chiliz_PSGxMIA_20250629");
         // Exemplo: 75.87% para A, 24.13% para B
         oracle.updateHype(testHypeId, 7587, 2413);
         console.log("[4] Test match scheduled with hypeId: ");
         console.logBytes4(testHypeId);
 
-        console.log("[5] Opening match to receive bets");
-        oracle.openToBets(testHypeId);
+        console.log("[5] Match scheduled and ready for bets");
 
         vm.stopBroadcast();
     }

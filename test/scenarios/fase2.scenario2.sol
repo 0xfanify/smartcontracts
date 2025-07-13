@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "../../src/tokens/HypeToken.sol";
 import "../../src/oracle/Oracle.sol";
+import "../../src/oracle/MockAzuro.sol";
 import "../../src/fanify/Funify.sol";
 import "../BaseSetup.t.sol";
 
@@ -16,7 +17,8 @@ contract Fase2Cenario2Test is BaseSetup {
     function setUp() public override {
         super.setUp();
         token = new HypeToken();
-        oracle = new Oracle();
+        MockAzuro mockAzuro = new MockAzuro();
+        oracle = new Oracle(address(mockAzuro));
         vm.prank(casa);
         funify = new Funify(address(token), address(oracle));
 
@@ -25,14 +27,16 @@ contract Fase2Cenario2Test is BaseSetup {
         token.setFanifyContract(address(funify));
 
         // Schedule match for future time
-        uint256 scheduledTime = block.timestamp + 1 hours;
-        oracle.scheduleMatch(0x12345678, scheduledTime, "AAA", "BBB", "#aaa_bbb");
+        uint256 startTimestamp = block.timestamp + 3600;
+        uint256 duration = 7200;
+        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
 
         // Update hype (70% for Team A, 30% for Team B)
         oracle.updateHype(0x12345678, 7000, 3000);
 
-        // Open match for betting
-        oracle.openToBets(0x12345678);
+        // Salvar timestamps para uso no teste
+        vm.store(address(this), bytes32(uint256(0)), bytes32(startTimestamp));
+        vm.store(address(this), bytes32(uint256(1)), bytes32(duration));
 
         apostadores = createUsers(10);
         for (uint256 i = 0; i < 10; i++) {
@@ -42,38 +46,49 @@ contract Fase2Cenario2Test is BaseSetup {
         }
     }
 
+    function getTimestamps() internal view returns (uint256 startTimestamp, uint256 duration) {
+        startTimestamp = uint256(vm.load(address(this), bytes32(uint256(0))));
+        duration = uint256(vm.load(address(this), bytes32(uint256(1))));
+    }
+
     function testCenarioAleatorio2() public {
-        // Place random bets (7 on Team A, 3 on Team B)
+        (uint256 startTimestamp, uint256 duration) = getTimestamps();
+        
+        // Avançar para antes do início para apostar
+        vm.warp(startTimestamp - 10);
+        
+        // Place random bets
         for (uint256 i = 0; i < 10; i++) {
-            uint256 amount = (100 + (i * 100)) * 1 ether;
-            bool apostaA = i < 7;
             vm.prank(apostadores[i]);
-            funify.placeBet(0x12345678, apostaA, amount);
+            bool teamA = i < 3; // 3 no time A, 7 no time B
+            uint256 amount = (200 + i * 100) * 1 ether;
+            funify.placeBet(0x12345678, teamA, amount);
         }
 
-        // Close bets (match status becomes Closed)
-        oracle.closeBets(0x12345678);
+        // Avançar para o início do jogo para updateScore
+        vm.warp(startTimestamp + 1);
+        // Random score - Team B wins
+        oracle.updateScore(0x12345678, 0, 3);
 
-        // Update score: Team B wins (0-1)
-        oracle.updateScore(0x12345678, 0, 1);
+        // Avançar para depois do fim do jogo para claim
+        vm.warp(startTimestamp + duration + 1);
 
-        // Finish match (match status becomes Finished)
-        oracle.finishMatch(0x12345678);
-
-        // Winners claim prizes (Team B bettors - last 3 users)
-        for (uint256 i = 7; i < 10; i++) {
-            uint256 saldoAntes = token.balanceOf(apostadores[i]);
-            vm.prank(apostadores[i]);
-            funify.claimPrize(0x12345678);
-            assertGt(token.balanceOf(apostadores[i]), saldoAntes, "Sem ganho para vencedor");
-        }
-
-        // Losers should not receive anything (Team A bettors - first 7 users)
-        for (uint256 i = 0; i < 7; i++) {
-            vm.prank(apostadores[i]);
-            vm.expectRevert(bytes("E008")); // Espera revert porque perdeu
-
-            funify.claimPrize(0x12345678);
+        // Winners claim prizes
+        for (uint256 i = 0; i < 10; i++) {
+            bool betOnTeamA = i < 3;
+            bool teamBWon = 0 < 3; // Score: 0-3, Team B wins
+            
+            if (!betOnTeamA && teamBWon) { // Apostou no Team B e Team B venceu
+                uint256 saldoAntes = token.balanceOf(apostadores[i]);
+                vm.prank(apostadores[i]);
+                funify.claimPrize(0x12345678);
+                uint256 ganho = token.balanceOf(apostadores[i]) - saldoAntes;
+                assertGt(ganho, 0, "Winner sem ganho");
+            } else {
+                vm.prank(apostadores[i]);
+                vm.expectRevert(bytes("E008")); // Espera revert porque perdeu
+                funify.claimPrize(0x12345678);
+            }
         }
     }
 }

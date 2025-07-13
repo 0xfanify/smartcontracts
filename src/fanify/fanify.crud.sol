@@ -2,13 +2,13 @@
 pragma solidity ^0.8.20;
 
 import {FunifySec} from "./fanify.sec.sol";
-import {Status} from "../oracle/Oracle.sol";
+import {OracleStorage} from "../oracle/oracle.storage.sol";
 
 abstract contract FunifyCrud is FunifySec {
     constructor(address _token, address _oracle) FunifySec(_token, _oracle) {}
 
     function getOdds(bytes4 hypeId) public view returns (uint256 oddsA, uint256 oddsB) {
-        (uint256 hypeA, uint256 hypeB,) = oracle.getHype(hypeId);
+        (uint256 hypeA, uint256 hypeB, , , , , , ,) = oracle.getMatch(hypeId);
         if (hypeA + hypeB == 0) {
             revert(InvalidHypeValues);
         }

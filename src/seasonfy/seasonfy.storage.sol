@@ -62,10 +62,6 @@ abstract contract SeasonfyStorage is SeasonfyError, SeasonfyEvents {
     mapping(bytes4 => uint256) public prizePoolB; // Pool de prêmios para Time B
     mapping(bytes4 => uint256) public houseProfit; // Lucro da casa por match
 
-    // Configurações da temporada
-    uint256 public seasonEndTimestamp; // Timestamp do fim da temporada
-    uint256 public constant SEASON_DURATION = 365 days; // Duração da temporada
-
     // Taxa da casa (5%)
     uint256 public constant HOUSE_FEE = 5e16; // 5% = 0.05 * 1e18
 
@@ -82,8 +78,5 @@ abstract contract SeasonfyStorage is SeasonfyError, SeasonfyEvents {
         teamNFT = TeamNFT(_teamNFT);
         mockFanX = _mockFanX;
         owner = msg.sender;
-        
-        // Inicializa a temporada atual
-        seasonEndTimestamp = block.timestamp + SEASON_DURATION;
     }
 } 

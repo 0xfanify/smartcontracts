@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {SeasonfyStorage} from "./seasonfy.storage.sol";
 import {OracleStorage} from "../oracle/oracle.storage.sol";
+import {OracleCrud} from "../oracle/oracle.crud.sol";
 
 
 abstract contract SeasonfySec is SeasonfyStorage {
@@ -24,10 +25,8 @@ abstract contract SeasonfySec is SeasonfyStorage {
     }
 
     modifier onlyMatchFinished(bytes4 hypeId) {
-        (
-            , , , , uint256 startTimestamp, uint256 duration, , ,
-        ) = oracle.getMatch(hypeId);
-        if (block.timestamp < startTimestamp + duration) {
+        OracleCrud.GameStatus status = oracle.getGameStatus(hypeId);
+        if (status != OracleCrud.GameStatus.FINISHED) {
             revert(MatchNotFinished);
         }
         _;
@@ -56,12 +55,12 @@ abstract contract SeasonfySec is SeasonfyStorage {
         if (oracle.matchExists(hypeId) == false) {
             revert(NoBetOnMatch);
         }
-        (
-            , , , , uint256 startTimestamp, , , ,
-        ) = oracle.getMatch(hypeId);
-        if (block.timestamp >= startTimestamp) {
+        
+        OracleCrud.GameStatus status = oracle.getGameStatus(hypeId);
+        if (status != OracleCrud.GameStatus.NOT_STARTED) {
             revert(MatchNotOpen);
         }
+        
         if (amount == 0) {
             revert(InvalidBetAmount);
         }
@@ -85,7 +84,7 @@ abstract contract SeasonfySec is SeasonfyStorage {
     }
 
     modifier onlySeasonEnded() {
-        if (block.timestamp < seasonEndTimestamp) {
+        if (!oracle.isSeasonEnded()) {
             revert(SeasonNotEnded);
         }
         _;
@@ -95,7 +94,7 @@ abstract contract SeasonfySec is SeasonfyStorage {
         if (stakes[msg.sender].fanTokenAmount == 0) {
             revert(NoStakeFound);
         }
-        if (block.timestamp < seasonEndTimestamp) {
+        if (!oracle.isSeasonEnded()) {
             revert(SeasonNotEnded);
         }
         _;

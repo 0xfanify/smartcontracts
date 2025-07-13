@@ -19,13 +19,17 @@ abstract contract OracleStorage is OracleError, OracleEvents {
     address public immutable owner;
     MockAzuro public immutable mockAzuro;
 
+    // Constantes de tempo
+    uint256 public constant GAME_TIME = 7200; // 2 horas em segundos
+    uint256 public constant SEASON_TIME = 5256000; // 2 meses em segundos (60 dias)
+
     struct MatchHype {
         uint256 HypeA;
         uint256 HypeB;
         uint8 goalsA;
         uint8 goalsB;
         uint256 startTimestamp; // Quando o jogo começa (timestamp futuro)
-        uint256 duration; // Duração do jogo em segundos
+        uint256 gameTime; // Duração do jogo em segundos (configurável)
         string teamAAbbreviation; // Sigla do Time A (ex: "PSG", "REAL")
         string teamBAbbreviation; // Sigla do Time B (ex: "BAR", "JUV")
         string hashtag;
@@ -34,6 +38,9 @@ abstract contract OracleStorage is OracleError, OracleEvents {
     mapping(bytes4 hypeId => MatchHype) public matchHypes;
     bytes4[] public hypeIds; // Lista de todos os hypeIds
 
+    // Configurações de temporada
+    uint256 public seasonEndTimestamp; // Timestamp do fim da temporada atual
+
     /**
      * @dev Construtor que inicializa os contratos externos
      * @param _mockAzuro Endereço do contrato MockAzuro
@@ -41,5 +48,7 @@ abstract contract OracleStorage is OracleError, OracleEvents {
     constructor(address _mockAzuro) {
         owner = msg.sender;
         mockAzuro = MockAzuro(_mockAzuro);
+        // Inicializa a temporada atual
+        seasonEndTimestamp = block.timestamp + SEASON_TIME;
     }
 } 

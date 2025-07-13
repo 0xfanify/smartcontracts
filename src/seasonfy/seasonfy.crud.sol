@@ -44,10 +44,10 @@ abstract contract SeasonfyCrud is SeasonfySec {
     }
 
     function getSeasonInfo() external view returns (uint256 endTimestamp, uint256 duration) {
-        return (seasonEndTimestamp, SEASON_DURATION);
+        return (oracle.getSeasonEndTimestamp(), oracle.SEASON_TIME());
     }
 
     function isSeasonEnded() external view returns (bool) {
-        return block.timestamp >= seasonEndTimestamp;
+        return oracle.isSeasonEnded();
     }
 } 

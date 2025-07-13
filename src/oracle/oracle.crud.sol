@@ -5,11 +5,16 @@ import {OracleSec} from "./oracle.sec.sol";
 import {MockAzuro} from "../mocks/MockAzuro.sol";
 
 abstract contract OracleCrud is OracleSec {
+    // Enum para status do jogo
+    enum GameStatus {
+        NOT_STARTED, // Jogo ainda não começou
+        IN_PROGRESS, // Jogo em andamento
+        FINISHED     // Jogo finalizado
+    }
+
     // 1. Criar um Jogo
     function scheduleMatch(
         bytes4 hypeId,
-        uint256 startTimestamp,
-        uint256 duration,
         string memory teamAAbbreviation,
         string memory teamBAbbreviation,
         string memory hashtag
@@ -18,12 +23,13 @@ abstract contract OracleCrud is OracleSec {
         if (bytes(teamAAbbreviation).length == 0) revert(InvalidTeamAbbreviation);
         if (bytes(teamBAbbreviation).length == 0) revert(InvalidTeamAbbreviation);
         if (bytes(hashtag).length == 0) revert(OracleCallFailed);
-        if (startTimestamp <= block.timestamp) revert(OracleCallFailed);
-        if (duration == 0) revert(OracleCallFailed);
+
+        // Usar o timestamp atual como startTimestamp
+        uint256 startTimestamp = block.timestamp;
 
         matchHypes[hypeId] = MatchHype({
             startTimestamp: startTimestamp,
-            duration: duration,
+            gameTime: GAME_TIME, // Usar a constante padrão
             HypeA: 0,
             HypeB: 0,
             goalsA: 0,
@@ -34,7 +40,7 @@ abstract contract OracleCrud is OracleSec {
         });
 
         hypeIds.push(hypeId);
-        emit MatchScheduled(hypeId, startTimestamp, duration);
+        emit MatchScheduled(hypeId, startTimestamp, GAME_TIME);
     }
 
     // 2. Alimentar esse jogo com hype (hype A, hype B)
@@ -59,13 +65,64 @@ abstract contract OracleCrud is OracleSec {
     {
         MatchHype storage matchHype = matchHypes[hypeId];
         if (block.timestamp < matchHype.startTimestamp) revert(InvalidMatchStatus); // Só pode depois do início
-        if (block.timestamp >= matchHype.startTimestamp + matchHype.duration) revert(InvalidMatchStatus); // Só pode durante o jogo
+        if (block.timestamp >= matchHype.startTimestamp + matchHype.gameTime) revert(InvalidMatchStatus); // Só pode durante o jogo
         matchHype.goalsA = goalsA;
         matchHype.goalsB = goalsB;
         emit ScoreUpdated(hypeId, goalsA, goalsB);
     }
 
-    // CRUD para startTimestamp e duration
+    // Função para obter o status do jogo
+    function getGameStatus(bytes4 hypeId) public view onlyMatchExists(hypeId) returns (GameStatus) {
+        MatchHype storage matchHype = matchHypes[hypeId];
+        uint256 currentTime = block.timestamp;
+        
+        if (currentTime < matchHype.startTimestamp) {
+            return GameStatus.NOT_STARTED;
+        } else if (currentTime >= matchHype.startTimestamp + matchHype.gameTime) {
+            return GameStatus.FINISHED;
+        } else {
+            return GameStatus.IN_PROGRESS;
+        }
+    }
+
+    // CRUD para gameTime
+    function updateGameTime(bytes4 hypeId, uint256 newGameTime)
+        public
+        onlyOwner
+        onlyMatchExists(hypeId)
+    {
+        if (newGameTime == 0) revert(OracleCallFailed);
+        matchHypes[hypeId].gameTime = newGameTime;
+    }
+
+    function getGameTime(bytes4 hypeId)
+        public
+        view
+        onlyMatchExists(hypeId)
+        returns (uint256)
+    {
+        return matchHypes[hypeId].gameTime;
+    }
+
+    // CRUD para seasonEndTimestamp
+    function updateSeasonEndTimestamp(uint256 newSeasonEndTimestamp)
+        public
+        onlyOwner
+    {
+        if (newSeasonEndTimestamp <= block.timestamp) revert(OracleCallFailed);
+        seasonEndTimestamp = newSeasonEndTimestamp;
+    }
+
+    function getSeasonEndTimestamp() public view returns (uint256) {
+        return seasonEndTimestamp;
+    }
+
+    // Função para verificar se a temporada terminou
+    function isSeasonEnded() public view returns (bool) {
+        return block.timestamp >= seasonEndTimestamp;
+    }
+
+    // CRUD para startTimestamp (mantido para compatibilidade)
     function updateStartTimestamp(bytes4 hypeId, uint256 newStartTimestamp)
         public
         onlyOwner
@@ -75,15 +132,6 @@ abstract contract OracleCrud is OracleSec {
         matchHypes[hypeId].startTimestamp = newStartTimestamp;
     }
 
-    function updateDuration(bytes4 hypeId, uint256 newDuration)
-        public
-        onlyOwner
-        onlyMatchExists(hypeId)
-    {
-        if (newDuration == 0) revert(OracleCallFailed);
-        matchHypes[hypeId].duration = newDuration;
-    }
-
     function getStartTimestamp(bytes4 hypeId)
         public
         view
@@ -91,14 +139,5 @@ abstract contract OracleCrud is OracleSec {
         returns (uint256)
     {
         return matchHypes[hypeId].startTimestamp;
-    }
-
-    function getDuration(bytes4 hypeId)
-        public
-        view
-        onlyMatchExists(hypeId)
-        returns (uint256)
-    {
-        return matchHypes[hypeId].duration;
     }
 } 

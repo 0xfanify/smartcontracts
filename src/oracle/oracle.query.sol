@@ -14,7 +14,7 @@ abstract contract OracleQuery is OracleCrud {
             uint8 goalsA,
             uint8 goalsB,
             uint256 startTimestamp,
-            uint256 duration,
+            uint256 gameTime,
             string memory teamAAbbreviation,
             string memory teamBAbbreviation,
             string memory hashtag
@@ -29,7 +29,7 @@ abstract contract OracleQuery is OracleCrud {
             matchHype.goalsA,
             matchHype.goalsB,
             matchHype.startTimestamp,
-            matchHype.duration,
+            matchHype.gameTime,
             matchHype.teamAAbbreviation,
             matchHype.teamBAbbreviation,
             matchHype.hashtag

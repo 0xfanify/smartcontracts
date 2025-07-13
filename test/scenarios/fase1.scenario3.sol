@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "../../src/tokens/HypeToken.sol";
 import "../../src/oracle/Oracle.sol";
-import "../../src/oracle/MockAzuro.sol";
+import "../../src/mocks/MockAzuro.sol";
 import "../../src/fanify/Funify.sol";
 import "../BaseSetup.t.sol";
 
@@ -26,15 +26,17 @@ contract Fase1Cenario3Test is BaseSetup {
         vm.prank(address(this));
         token.setFanifyContract(address(funify));
 
-        // Schedule match for future time
-        uint256 startTimestamp = block.timestamp + 3600;
-        uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
+        // Simular criação do jogo no futuro
+        uint256 desiredStart = block.timestamp + 3600;
+        vm.warp(desiredStart - 100); // 100 segundos antes do início
+        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
 
         // Update hype (70% for Team A, 30% for Team B)
         oracle.updateHype(0x12345678, 7000, 3000);
 
         // Salvar timestamps para uso no teste
+        uint256 startTimestamp = oracle.getStartTimestamp(0x12345678);
+        uint256 duration = oracle.getGameTime(0x12345678);
         vm.store(address(this), bytes32(uint256(0)), bytes32(startTimestamp));
         vm.store(address(this), bytes32(uint256(1)), bytes32(duration));
 

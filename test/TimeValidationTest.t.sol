@@ -38,7 +38,7 @@ contract TimeValidationTest is Test, FunifyError {
         // Agendar jogo para 1 hora no futuro
         uint256 startTimestamp = block.timestamp + 3600;
         uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
         // Para os testes de aposta, não iniciar o jogo ainda
         
@@ -56,7 +56,7 @@ contract TimeValidationTest is Test, FunifyError {
         // Agendar jogo para 1 hora no futuro
         uint256 startTimestamp = block.timestamp + 3600;
         uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
         // Para os testes de aposta, não iniciar o jogo ainda
         
@@ -73,7 +73,7 @@ contract TimeValidationTest is Test, FunifyError {
         // Agendar jogo para 1 hora no futuro
         uint256 startTimestamp = block.timestamp + 3600;
         uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
         // Para os testes de aposta, não iniciar o jogo ainda
         
@@ -90,7 +90,7 @@ contract TimeValidationTest is Test, FunifyError {
         // Agendar jogo para 1 hora no futuro
         uint256 startTimestamp = block.timestamp + 3600;
         uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
         // Para os testes de aposta, não iniciar o jogo ainda
         

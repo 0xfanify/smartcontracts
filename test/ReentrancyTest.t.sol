@@ -59,9 +59,9 @@ contract ReentrancyTest is Test {
         token.setFanifyContract(address(funify));
 
         // Configurar partida
-        uint256 startTimestamp = block.timestamp + 3600; // 1 hora no futuro
-        uint256 duration = 7200; // 2 horas de duração
-        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
+        uint256 startTimestamp = oracle.getStartTimestamp(0x12345678);
+        uint256 duration = oracle.getGameTime(0x12345678);
         oracle.updateHype(0x12345678, 7000, 3000);
 
         // Dar tokens ao atacante

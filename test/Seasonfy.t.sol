@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import {Test} from "forge-std/Test.sol";
 import {HypeToken} from "../src/tokens/HypeToken.sol";
 import {Oracle} from "../src/oracle/Oracle.sol";
-import {MockAzuro} from "../src/oracle/MockAzuro.sol";
+import {MockAzuro} from "../src/mocks/MockAzuro.sol";
 import {TeamNFT} from "../src/tokens/TeamNFT.sol";
 import {MockFanX} from "../src/mocks/MockFanX.sol";
 import {Seasonfy} from "../src/seasonfy/Seasonfy.sol";
@@ -137,9 +137,7 @@ contract SeasonfyTest is Test {
         seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId);
         
         // Schedule match
-        uint256 startTimestamp = block.timestamp + 3600;
-        uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
         
         // Approve HYPE for betting
@@ -167,9 +165,7 @@ contract SeasonfyTest is Test {
         seasonfy.stakeFanToken(mockFanToken, stakeAmount, teamId);
         
         // Schedule match
-        uint256 startTimestamp = block.timestamp + 3600;
-        uint256 duration = 7200;
-        oracle.scheduleMatch(0x12345678, startTimestamp, duration, "AAA", "BBB", "#aaa_bbb");
+        oracle.scheduleMatch(0x12345678, "AAA", "BBB", "#aaa_bbb");
         oracle.updateHype(0x12345678, 7000, 3000);
         
         // Approve HYPE for betting

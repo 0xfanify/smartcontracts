@@ -31,9 +31,7 @@
 - [ ] o usuario só pode aposta a favor do time, e só nos jogo que o time dele está jogando (trava feita pelo NFT)
 - [ ] o usuário pode apostar ou nao, mas nao pode apostar contra o time dele
 - [ ] no fim da tempoda o Usuário pode fazer unstake a qualquer momento.
-
----
-Renomei TUDO de timeA/timeB para em Home/Away 
+- [ ] Renomei TUDO de timeA/timeB para em Home/Away 
 
 ---
 

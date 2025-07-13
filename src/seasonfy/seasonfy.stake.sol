@@ -79,7 +79,7 @@ abstract contract SeasonfyStake is SeasonfyCrud {
         if (newEndTimestamp <= block.timestamp) {
             revert(InvalidStakeAmount);
         }
-        seasonEndTimestamp = newEndTimestamp;
+        oracle.updateSeasonEndTimestamp(newEndTimestamp);
         emit SeasonEndTimestampUpdated(newEndTimestamp);
     }
 } 

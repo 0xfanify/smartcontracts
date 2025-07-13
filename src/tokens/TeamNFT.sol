@@ -69,7 +69,7 @@ contract TeamNFT is ERC721, Ownable {
         revert("Transfers disabled");
     }
 
-    function setApprovalForAll(address, bool) public override {
+    function setApprovalForAll(address, bool) public pure override {
         revert("Transfers disabled");
     }
 
@@ -109,11 +109,8 @@ contract TeamNFT is ERC721, Ownable {
     function _buildTokenURI(uint256 teamId, uint256 seasonId) internal pure returns (string memory) {
         return string(
             abi.encodePacked(
-                "https://api.funify.xyz/metadata?teamId=",
-                teamId.toString(),
-                "&seasonId=",
-                seasonId.toString()
+                "https://api.fanify.xyz/metadata?teamId=", teamId.toString(), "&seasonId=", seasonId.toString()
             )
         );
     }
-} 
+}

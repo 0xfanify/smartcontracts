@@ -6,7 +6,7 @@ import "solady/tokens/ERC20.sol";
 contract HypeToken is ERC20 {
     address public owner;
     bool private _locked;
-    address public funifyContract;
+    address public fanifyContract;
 
     // Events
     event TokensStaked(address indexed user, uint256 ethAmount, uint256 tokensMinted);
@@ -31,8 +31,8 @@ contract HypeToken is ERC20 {
         // _mint(msg.sender, 1_000_000e18);
     }
 
-    function setFunifyContract(address _funifyContract) external onlyOwner {
-        funifyContract = _funifyContract;
+    function setFanifyContract(address _fanifyContract) external onlyOwner {
+        fanifyContract = _fanifyContract;
     }
 
     function name() public pure override returns (string memory) {
@@ -47,23 +47,23 @@ contract HypeToken is ERC20 {
         return 18;
     }
 
-    // Override transfer functions to make token non-transferable except for Funify contract
+    // Override transfer functions to make token non-transferable except for Fanify contract
     function transfer(address to, uint256 amount) public override returns (bool) {
-        if (msg.sender == funifyContract || to == funifyContract) {
+        if (msg.sender == fanifyContract || to == fanifyContract) {
             return super.transfer(to, amount);
         }
         revert("HYPE tokens are non-transferable");
     }
 
     function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
-        if (msg.sender == funifyContract || from == funifyContract || to == funifyContract) {
+        if (msg.sender == fanifyContract || from == fanifyContract || to == fanifyContract) {
             return super.transferFrom(from, to, amount);
         }
         revert("HYPE tokens are non-transferable");
     }
 
     function approve(address spender, uint256 amount) public override returns (bool) {
-        if (spender == funifyContract) {
+        if (spender == fanifyContract) {
             return super.approve(spender, amount);
         }
         revert("HYPE tokens are non-transferable");

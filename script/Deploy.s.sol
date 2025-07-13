@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import {Script, console} from "forge-std/Script.sol";
 import {HypeToken} from "../src/tokens/HypeToken.sol";
 import {Oracle} from "../src/oracle/Oracle.sol";
-import {Funify} from "../src/funify/Funify.sol";
+import {Funify} from "../src/fanify/Funify.sol";
 
 contract DeployScript is Script {
     function setUp() public {}
@@ -27,10 +27,10 @@ contract DeployScript is Script {
         Oracle oracle = new Oracle();
         console.log("[6] Oracle deployed at:", address(oracle));
 
-        // Deploy Funify
-        console.log("[7] Deploying Funify...");
-        Funify funify = new Funify(address(hypeToken), address(oracle));
-        console.log("[8] Funify deployed at:", address(funify));
+        // Deploy Fanify
+        console.log("[7] Deploying Fanify...");
+        Funify fanify = new Funify(address(hypeToken), address(oracle));
+        console.log("[8] Fanify deployed at:", address(fanify));
 
         vm.stopBroadcast();
     }

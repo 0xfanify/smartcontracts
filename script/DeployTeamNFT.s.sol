@@ -8,15 +8,15 @@ contract DeployTeamNFT is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address stakeContract = vm.envAddress("STAKE_CONTRACT");
-        
+
         vm.startBroadcast(deployerPrivateKey);
-        
+
         TeamNFT teamNFT = new TeamNFT();
         teamNFT.setStakeContract(stakeContract);
-        
+
         vm.stopBroadcast();
-        
+
         console.log("TeamNFT deployed at:", address(teamNFT));
         console.log("Stake contract set to:", stakeContract);
     }
-} 
+}

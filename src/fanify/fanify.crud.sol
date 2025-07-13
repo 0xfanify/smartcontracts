@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {FunifySec} from "./funify.sec.sol";
+import {FunifySec} from "./fanify.sec.sol";
 import {Status} from "../oracle/Oracle.sol";
 
 abstract contract FunifyCrud is FunifySec {

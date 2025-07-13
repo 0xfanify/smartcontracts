@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {FunifyError} from "../funify/Funify.error.sol";
+import {FunifyError} from "../fanify/fanify.error.sol";
 
 enum Status {
     Scheduled, // 0. Jogo criado e agendado

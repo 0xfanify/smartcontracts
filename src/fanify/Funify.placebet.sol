@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {FunifyClaim} from "./funify.claim.sol";
+import {FunifyClaim} from "./fanify.claim.sol";
 
 abstract contract FunifyPlaceBet is FunifyClaim {
     constructor(address _token, address _oracle) FunifyClaim(_token, _oracle) {}

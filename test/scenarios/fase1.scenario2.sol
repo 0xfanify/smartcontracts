@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "../../src/tokens/HypeToken.sol";
 import "../../src/oracle/Oracle.sol";
-import "../../src/funify/Funify.sol";
+import "../../src/fanify/Funify.sol";
 import "../BaseSetup.t.sol";
 
 contract Fase1Cenario2Test is BaseSetup {
@@ -22,10 +22,10 @@ contract Fase1Cenario2Test is BaseSetup {
         // Deploy Funify com casa como owner
         vm.prank(casa);
         funify = new Funify(address(token), address(oracle));
-        
+
         // Set Funify contract in HypeToken to allow transfers
         vm.prank(address(this));
-        token.setFunifyContract(address(funify));
+        token.setFanifyContract(address(funify));
 
         // Schedule match for future time
         uint256 scheduledTime = block.timestamp + 1 hours;

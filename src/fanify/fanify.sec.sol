@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {FunifyStorage} from "./funify.storage.sol";
+import {FunifyStorage} from "./fanify.storage.sol";
 import {Status} from "../oracle/Oracle.sol";
 
 abstract contract FunifySec is FunifyStorage {

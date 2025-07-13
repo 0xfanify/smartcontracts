@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {FunifyCrud} from "./funify.crud.sol";
+import {FunifyCrud} from "./fanify.crud.sol";
 
 abstract contract FunifyClaim is FunifyCrud {
     constructor(address _token, address _oracle) FunifyCrud(_token, _oracle) {}
@@ -30,9 +30,7 @@ abstract contract FunifyClaim is FunifyCrud {
         uint256 userOdds = bet.teamA ? oddsA : oddsB;
 
         uint256 prizePool = _getPrizePool(hypeId);
-        uint256 totalProporcao = _getTotalProporcao(
-            teamAWon, prizePoolA[hypeId], prizePoolB[hypeId], oddsA, oddsB
-        );
+        uint256 totalProporcao = _getTotalProporcao(teamAWon, prizePoolA[hypeId], prizePoolB[hypeId], oddsA, oddsB);
 
         return _calculateFinalPrize(bet.amount, userOdds, prizePool, totalProporcao);
     }
@@ -51,22 +49,19 @@ abstract contract FunifyClaim is FunifyCrud {
         return totalPool - houseCut;
     }
 
-    function _calculateFinalPrize(
-        uint256 amount,
-        uint256 userOdds,
-        uint256 prizePool,
-        uint256 totalProporcao
-    ) internal pure returns (uint256) {
+    function _calculateFinalPrize(uint256 amount, uint256 userOdds, uint256 prizePool, uint256 totalProporcao)
+        internal
+        pure
+        returns (uint256)
+    {
         return (amount * userOdds * prizePool) / totalProporcao;
     }
 
-    function _getTotalProporcao(
-        bool teamAWon,
-        uint256 prizePoolA_,
-        uint256 prizePoolB_,
-        uint256 oddsA,
-        uint256 oddsB
-    ) internal pure returns (uint256) {
+    function _getTotalProporcao(bool teamAWon, uint256 prizePoolA_, uint256 prizePoolB_, uint256 oddsA, uint256 oddsB)
+        internal
+        pure
+        returns (uint256)
+    {
         return teamAWon ? prizePoolA_ * oddsA : prizePoolB_ * oddsB;
     }
 

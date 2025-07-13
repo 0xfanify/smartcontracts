@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
-import {HypeToken} from "../src/token/HypeToken.sol";
+import {HypeToken} from "../src/tokens/HypeToken.sol";
 
 contract HypeTokenSimpleTest is Test {
     HypeToken public hypeToken;

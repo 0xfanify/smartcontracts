@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-import {HypeToken} from "../src/token/HypeToken.sol";
+import {HypeToken} from "../src/tokens/HypeToken.sol";
 import {Oracle} from "../src/oracle/Oracle.sol";
 import {Funify} from "../src/funify/Funify.sol";
 

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "lib/forge-std/src/Script.sol";
-import {TeamNFT} from "../src/TeamNFT.sol";
+import {TeamNFT} from "../src/tokens/TeamNFT.sol";
 
 contract DeployTeamNFT is Script {
     function run() external {

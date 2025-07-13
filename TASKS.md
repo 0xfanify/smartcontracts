@@ -8,24 +8,6 @@
 
 ---
 
-# Team NFT (ERC-721 Não-Transferível)
-
-- [x] Criar contrato `TeamNFT.sol` como ERC-721 com função `mintTo(address, teamId, seasonId)`.
-- [x] Tornar o NFT **non-transferable** sobrescrevendo `transferFrom` e `approve` para revert.
-- [x] Adicionar metadados `teamId` e `seasonId` no token URI.
-- [x] Implementar função `burn(uint256 tokenId)` acessível apenas pelo contrato de stake.
-- [x] Escrever teste unitário para garantir que `transfer` e `approve` revertam.
-
----
-
-# Token \$HYPE (ERC-20 Não-Transferível)
-
-- [x] Criar/atualizar o contrato \$HYPE para sobrescrever `transfer`, `transferFrom` e `approve`, revertendo toda tentativa de movimentação.
-- [x] Validar que a cunhagem e queima estão atreladas apenas às funções de stake e unstake.
-- [x] Escrever teste unitário para garantir a não-transferibilidade do \$HYPE.
-
----
-
 # Stake CHZ e Fan Tokens
 
 - [ ] Atualizar `CHZStake.sol` para garantir `approve()` no `unstake()` via `IERC20.transferFrom`.
@@ -72,21 +54,26 @@
 
 ---
 
-# Testes & Auditoria
-
-- [ ] Escrever teste unitário para `TeamNFT.sol`, testando `mint`, `burn` e bloqueio de `transfer`.
-- [ ] Escrever teste unitário para `HYPE.sol`, testando bloqueio de transferências.
-- [ ] Escrever teste de integração completo para `stake → mint NFT → aposta → claim → unstake → burn`.
-- [ ] Atualizar plano de auditoria com foco em:
-
-  - [ ] Verificação de ownership no NFT.
-  - [ ] Restrições de transferência.
-  - [ ] Lógica de queima do NFT e segurança do claim.
-
----
-
 # Implantação
 
 - [ ] Implementar script de deploy com parâmetros para `TeamNFT`, `HYPE`, `Stake`.
 - [ ] Testar todo fluxo em testnet: stake → NFT → aposta → claim → unstake (NFT queimado).
 - [ ] Verificar se NFT realmente é removido do `ownerOf` após `burn`.
+
+---
+
+# Team NFT (ERC-721 Não-Transferível)
+
+- [x] Criar contrato `TeamNFT.sol` como ERC-721 com função `mintTo(address, teamId, seasonId)`.
+- [x] Tornar o NFT **non-transferable** sobrescrevendo `transferFrom` e `approve` para revert.
+- [x] Adicionar metadados `teamId` e `seasonId` no token URI.
+- [x] Implementar função `burn(uint256 tokenId)` acessível apenas pelo contrato de stake.
+- [x] Escrever teste unitário para garantir que `transfer` e `approve` revertam.
+
+---
+
+# Token \$HYPE (ERC-20 Não-Transferível)
+
+- [x] Criar/atualizar o contrato \$HYPE para sobrescrever `transfer`, `transferFrom` e `approve`, revertendo toda tentativa de movimentação.
+- [x] Validar que a cunhagem e queima estão atreladas apenas às funções de stake e unstake.
+- [x] Escrever teste unitário para garantir a não-transferibilidade do \$HYPE.

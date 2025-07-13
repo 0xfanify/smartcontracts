@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Test} from "lib/forge-std/src/Test.sol";
-import {TeamNFT} from "../src/TeamNFT.sol";
+import {TeamNFT} from "../src/tokens/TeamNFT.sol";
 
 contract TeamNFTTest is Test {
     TeamNFT public nft;
